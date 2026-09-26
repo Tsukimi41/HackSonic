@@ -14,7 +14,7 @@ export function DetailPanel({field,series,methodology,inCandidates,onToggle,onCl
     <div className="detail-top"><div><h2 id="detail-title">{field.field_id.replace('maff-2026-','圃場 ')}</h2></div>{onClose&&<button className="icon-button" onClick={onClose} aria-label="詳細を閉じる"><X/></button>}</div>
     <div className="status-hero" style={{borderLeftColor:status.color}}><div><span className={`status-pill ${status.tone}`}>{status.label}</span><p>{reasons[0]}</p></div><div className="confidence"><strong>{pct(field.confidence)}</strong><span>証拠の強さ</span></div></div>
     <p className="caution"><AlertTriangle size={17}/>衛星解析だけでは確定できません。交付金等の判断には所定の確認が必要です。</p>
-    <section className="detail-section"><div className="section-title"><h3>申告との照合</h3><span className="demo-tag">デモ用架空データ</span></div>
+    <section className="detail-section"><div className="section-title"><h3>申告との照合（架空データ）</h3></div>
       <div className="compare-row"><div><span>架空申告</span><strong>{CROP[field.declared_crop??'']??'—'}・{DECLARED_STATUS[field.declared_status??'']??'—'}</strong></div><ArrowRight/><div><span>照合結果</span><strong className={`match-${field.declaration_match}`}>{MATCH[field.declaration_match]}</strong></div></div>
     </section>
     <section className="detail-section"><h3>判定の理由</h3><ul className="reason-list">{reasons.map((r,i)=><li key={`${r}-${i}`}><CheckCircle2 size={18}/>{r}</li>)}</ul>
