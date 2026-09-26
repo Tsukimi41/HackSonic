@@ -34,7 +34,7 @@ export function MapPanel({data,roi,selectedId,onSelect}:Props){
   useEffect(()=>{if(ready)(mapRef.current?.getSource('fields') as GeoJSONSource)?.setData(data)},[data,ready])
   useEffect(()=>{if(ready)mapRef.current?.setFilter('field-selected',['==',['get','field_id'],selectedId??''])},[selectedId,ready])
   useEffect(()=>{if(ready && mapRef.current?.getLayer('osm'))mapRef.current.setLayoutProperty('osm','visibility',background?'visible':'none')},[background,ready])
-  return <section className="map-card" aria-labelledby="map-heading"><div className="panel-heading map-heading"><div><span className="eyebrow">圃場地図</span><h2 id="map-heading">2025年の衛星判定</h2></div><button className="button button-ghost compact" onClick={()=>setBackground(v=>!v)}><Layers size={17}/>{background?'背景を隠す':'背景を表示'}</button></div>
+  return <section className="map-card" aria-labelledby="map-heading"><div className="panel-heading map-heading"><div><h2 id="map-heading">2025年の衛星判定</h2></div><button className="button button-ghost compact" onClick={()=>setBackground(v=>!v)}><Layers size={17}/>{background?'背景を隠す':'背景を表示'}</button></div>
     {tileWarning&&<div className="map-warning" role="status">背景地図を取得できません。圃場レイヤと一覧は引き続き利用できます。</div>}
     <div className="map-wrap"><div ref={node} className="map" aria-label="南相馬市東部の圃場判定地図"/><div className="map-count"><MapPinned size={16}/>{data.features.length}筆を表示</div></div>
     <div className="legend" aria-label="地図凡例">{[['#2a9d82','作付の兆候あり'],['#e3a12f','休耕の可能性'],['#d64a5b','要確認'],['#7b8493','観測不足']].map(([c,l])=><span key={l}><i style={{background:c}}/>{l}</span>)}</div>
