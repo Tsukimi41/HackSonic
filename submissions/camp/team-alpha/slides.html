@@ -1,0 +1,640 @@
+<title>浜通りの作付休耕判別</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=IBM+Plex+Mono:wght@400;500;600&display=block">
+
+<style>
+:root{
+  --ink:#0E1419;
+  --paper:#E8ECEE;
+  --card:#F7F8F9;
+  --rule:#C3CBCF;
+  --slate:#5A666E;
+  --sar:#B4762A;
+  --opt:#2F6B4F;
+  --water:#1C5566;
+  --muted:#8B979D;
+  --grid:#D5DBDE;
+  --disp:"Zen Kaku Gothic New","Hiragino Kaku Gothic ProN",system-ui,sans-serif;
+  --body:"Zen Kaku Gothic New","Hiragino Sans",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ink:#DFE6E9;--paper:#0D1216;--card:#141A1F;--rule:#2C363C;--slate:#9AA7AD;
+    --sar:#DFA352;--opt:#63B183;--water:#4E9DB5;--muted:#6B777D;--grid:#232C32;
+  }
+}
+:root[data-theme="dark"]{
+  --ink:#DFE6E9;--paper:#0D1216;--card:#141A1F;--rule:#2C363C;--slate:#9AA7AD;
+  --sar:#DFA352;--opt:#63B183;--water:#4E9DB5;--muted:#6B777D;--grid:#232C32;
+}
+
+*{box-sizing:border-box;}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:var(--body);font-size:14px;line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+}
+.deck{display:flex;flex-direction:column;align-items:center;gap:24px;padding:24px 16px 60px;}
+
+.page{
+  width:100%;max-width:1100px;background:var(--card);border:1px solid var(--rule);
+  padding:34px 44px 30px;display:flex;flex-direction:column;gap:18px;
+}
+
+.head{display:flex;flex-direction:column;gap:3px;border-bottom:2px solid var(--ink);padding-bottom:11px;}
+.step{font-family:var(--mono);font-size:11.5px;font-weight:600;letter-spacing:.16em;color:var(--sar);text-transform:uppercase;}
+h1{font-family:var(--disp);font-weight:900;font-size:40px;line-height:1.18;letter-spacing:-.02em;margin:0;text-wrap:balance;}
+h2{font-family:var(--disp);font-weight:900;font-size:27px;line-height:1.25;letter-spacing:-.01em;margin:0;text-wrap:balance;}
+h3{font-family:var(--disp);font-weight:700;font-size:14px;margin:6px 0 0;padding-bottom:5px;border-bottom:1px solid var(--rule);}
+h4{font-family:var(--disp);font-weight:700;font-size:12.5px;color:var(--slate);margin:4px 0 0;}
+
+p{margin:0;}
+.lead{font-size:15px;color:var(--slate);}
+.lead b,p b,li b,td b{color:var(--ink);font-weight:700;}
+
+.two{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start;}
+.two-w{display:grid;grid-template-columns:1.35fr .8fr;gap:24px;align-items:start;}
+.col{display:flex;flex-direction:column;gap:10px;min-width:0;}
+
+table{border-collapse:collapse;width:100%;font-size:12.5px;}
+th,td{text-align:left;padding:6px 10px 6px 0;border-bottom:1px solid var(--grid);vertical-align:top;}
+th{font-family:var(--disp);font-weight:700;color:var(--slate);font-size:11.5px;}
+th.n,td.n{white-space:nowrap;}
+td.num{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap;}
+thead th{border-bottom:1.5px solid var(--rule);color:var(--ink);}
+
+ul,ol{margin:0;padding-left:1.15em;font-size:13px;display:flex;flex-direction:column;gap:5px;}
+li::marker{color:var(--muted);}
+code{font-family:var(--mono);font-size:.9em;background:var(--paper);padding:.1em .34em;border:1px solid var(--grid);}
+
+blockquote{
+  margin:0;padding:9px 13px;background:var(--paper);border-left:3px solid var(--muted);
+  font-size:12.5px;color:var(--slate);
+}
+blockquote b{color:var(--ink);}
+
+figure{margin:0;display:flex;flex-direction:column;gap:6px;}
+svg{display:block;width:100%;height:auto;}
+figcaption{font-family:var(--mono);font-size:10.5px;color:var(--muted);}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-family:var(--mono);font-size:11px;color:var(--slate);}
+.legend span{display:flex;align-items:center;gap:6px;}
+.swatch{width:16px;height:0;border-top-width:3px;border-top-style:solid;}
+
+.chip{display:grid;grid-template-columns:auto 1fr;gap:10px;font-size:12.5px;padding:8px 11px;background:var(--paper);border-left:3px solid var(--muted);}
+.chip-k{font-family:var(--disp);font-weight:700;white-space:nowrap;}
+.crop{border-left-color:var(--opt);}
+.check{border-left-color:var(--sar);}
+.fallow{border-left-color:var(--slate);}
+.chips{display:flex;flex-direction:column;gap:6px;}
+
+.tag{font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.06em;color:var(--card);background:var(--sar);padding:1px 6px;}
+.tag.todo{background:var(--slate);}
+
+.foot{display:flex;justify-content:space-between;gap:16px;font-family:var(--mono);font-size:10px;color:var(--muted);border-top:1px solid var(--rule);padding-top:9px;margin-top:auto;}
+
+.cover{gap:26px;padding:70px 44px;}
+.cover .meta{display:grid;grid-template-columns:auto 1fr;gap:6px 22px;font-size:13.5px;}
+.cover .meta dt{font-family:var(--disp);font-weight:700;color:var(--slate);}
+.cover .meta dd{margin:0;}
+.toc{display:grid;grid-template-columns:auto 1fr;gap:5px 16px;font-size:13px;}
+.toc dt{font-family:var(--mono);font-weight:600;color:var(--sar);}
+.toc dd{margin:0;}
+
+@media print{
+  @page{size:297mm 210mm;margin:9mm 10mm;}
+  body{background:#fff;font-size:10.5px;line-height:1.48;}
+  .deck{gap:0;padding:0;}
+  .page{max-width:none;border:none;background:#fff;padding:0;break-after:page;min-height:0;gap:10px;}
+  .page:last-child{break-after:auto;}
+  h1{font-size:30px;} h2{font-size:19px;} h3{font-size:11.5px;margin-top:3px;padding-bottom:3px;}
+  h4{font-size:10.5px;margin-top:2px;}
+  .lead{font-size:11px;}
+  p,li,td,th{font-size:10px !important;}
+  table{font-size:10px;} th,td{padding:3.5px 8px 3.5px 0;}
+  ul,ol{font-size:10px;gap:3px;}
+  blockquote{font-size:9.5px;padding:6px 9px;}
+  .chip{font-size:10px;padding:5px 9px;}
+  figcaption,.legend{font-size:9px;}
+  .head{padding-bottom:7px;}
+  .two,.two-w{gap:18px;}
+  .col{gap:7px;}
+  .foot{display:none;}
+  .cover{padding:22mm 0 0;gap:20px;}
+  .cover .meta,.toc{font-size:11.5px;}
+  h3,h4,figure,table,blockquote,.chip{break-inside:avoid;}
+}
+</style>
+
+<div class="deck">
+
+<!-- ═══ 表紙 ═══ -->
+<section class="page cover">
+  <div class="head">
+    <p class="step">解析計画書 ／ W6 メンターレビュー</p>
+    <h1>相馬市・南相馬市における<br>作付 / 休耕の判別</h1>
+  </div>
+  <dl class="meta">
+    <dt>チーム</dt><dd>Alpha（camp-alpha）</dd>
+    <dt>メンバー</dt><dd>永島柊平／五味那奈／松井博史</dd>
+    <dt>日付</dt><dd>2026-08-20</dd>
+    <dt>原本</dt><dd><code>submissions/camp/team-alpha/analysis_doc.md</code></dd>
+  </dl>
+  <h3>構成</h3>
+  <dl class="toc">
+    <dt>Step 1</dt><dd>課題 ── 誰の、何の課題を解決するか</dd>
+    <dt>Step 2</dt><dd>物理仮説 ── なぜ光学＋SAR で判別できるか</dd>
+    <dt>Step 3</dt><dd>使用データと前処理 ── 5つの問いを数値条件にする</dd>
+    <dt>Step 4</dt><dd>解析手法 ── 時系列解析・3段階分類</dd>
+    <dt>Step 5</dt><dd>検証・成功の定義 ── 3層構成</dd>
+    <dt>Step 6</dt><dd>社会実装・費用対効果</dd>
+    <dt>付</dt><dd>技術的相談事項</dd>
+  </dl>
+  <div class="foot"><span>Team Alpha</span><span>2026-08-20</span></div>
+</section>
+
+<!-- ═══ Step 1 ═══ -->
+<section class="page">
+  <div class="head">
+    <p class="step">Step 1 ／ 課題（非専門家観点）</p>
+    <h2>現地に赴かずに農地の利用状況を知りたい</h2>
+  </div>
+  <p class="lead">対象は2者。どちらも「現地に赴かずに農地の利用状況を知りたい」という共通の課題を持つ。</p>
+
+  <div class="two">
+    <div class="col">
+      <h3>① 農業委員会・農政担当者（業務効率化）</h3>
+      <p>毎年、広大な農地を現地確認する必要があり、大きな労力とコストがかかっている。作付 / 休耕の判別結果があれば現地確認の優先順位づけができ、全農地を一律に歩く従来のやり方より効率化できる。</p>
+    </div>
+    <div class="col">
+      <h3>② 将来の農地利用予定者（投資判断）</h3>
+      <p>新規就農者・農業法人など、農地の借り手・買い手にとって、その農地に利用価値があるかを判断する情報になる。農地全体のうちどれくらい復興が進んでいるか、それらの農地にどれくらいの収穫が期待できるかといった投資判断に必要な情報を、現地に赴かずに得られる。</p>
+    </div>
+  </div>
+
+  <h3>一行結論</h3>
+  <p class="lead">震災から15年を経た浜通りの農地について、<b>「どこが使われていて、どこが使われていないか」を現地に行かずに面的に把握できるようにする。</b></p>
+
+  <h3>対象エリア</h3>
+  <table>
+    <tr><th class="n">対象自治体</th><td>福島県 相馬市・南相馬市（浜通り）</td></tr>
+    <tr><th class="n">ROI</th><td><code>[140.85, 37.55, 141.02, 37.80]</code>（約 15 km × 27.7 km ≒ 415 km²）</td></tr>
+    <tr><th class="n">耕地面積</th><td>相馬市 <span class="num">3,260 ha</span>／南相馬市 <span class="num">6,910 ha</span>／2市計 <span class="num">10,170 ha</span>（e-Stat 令和6年）</td></tr>
+  </table>
+  <blockquote><span class="tag todo">要修正</span> ROI 東端（経度 141.02）は海岸線より東にあり海域を含む。筆ポリゴンによる限定で解消されるが、ROI 自体の東端も見直す。</blockquote>
+
+  <div class="foot"><span>Step 1 ／ 課題</span><span>Team Alpha</span></div>
+</section>
+
+<!-- ═══ Step 2 ═══ -->
+<section class="page">
+  <div class="head">
+    <p class="step">Step 2 ／ 物理仮説（専門家観点）</p>
+    <h2>水田は「暗くなってから、明るくなる」</h2>
+  </div>
+  <p class="lead">作付地は NDVI が7月にピークへ上昇する一方、SAR の σ⁰ は<b>5月に湛水（水面での鏡面反射）で急落し、7〜8月に生育（体積散乱・ダブルバウンス）で急上昇</b>する。休耕地はどちらの指標も年間を通してほとんど変化しない。</p>
+
+  <div class="two-w">
+    <div class="col">
+      <figure>
+        <svg viewBox="0 0 760 300" role="img" aria-label="作付地と休耕地における VH 後方散乱と NDVI の季節変化">
+          <rect x="150" y="34" width="120" height="242" fill="var(--water)" opacity="0.09"/>
+          <text x="210" y="28" text-anchor="middle" font-family="var(--mono)" font-size="11" font-weight="600" fill="var(--water)">湛水期</text>
+          <g stroke="var(--grid)" stroke-width="1">
+            <line x1="60" y1="40" x2="660" y2="40"/><line x1="60" y1="155" x2="660" y2="155"/><line x1="60" y1="270" x2="660" y2="270"/>
+          </g>
+          <g font-family="var(--mono)" font-size="11" fill="var(--muted)">
+            <text x="52" y="44" text-anchor="end">−10</text><text x="52" y="159" text-anchor="end">−17.5</text><text x="52" y="274" text-anchor="end">−25</text>
+            <text x="668" y="44">1.2</text><text x="668" y="159">0.6</text><text x="668" y="274">0</text>
+          </g>
+          <text x="30" y="155" font-family="var(--mono)" font-size="11" font-weight="600" fill="var(--sar)" transform="rotate(-90 30 155)" text-anchor="middle">σ⁰ VH [dB]</text>
+          <text x="726" y="155" font-family="var(--mono)" font-size="11" font-weight="600" fill="var(--opt)" transform="rotate(90 726 155)" text-anchor="middle">NDVI</text>
+          <g font-family="var(--mono)" font-size="12" fill="var(--slate)" text-anchor="middle">
+            <text x="60" y="292">4月</text><text x="210" y="292">5月</text><text x="360" y="292">6月</text><text x="510" y="292">7月</text><text x="660" y="292">8月</text>
+          </g>
+          <path d="M60,117 L210,119 L360,118 L510,121 L660,120" fill="none" stroke="var(--sar)" stroke-width="2" opacity="0.55" stroke-dasharray="2 5"/>
+          <path d="M60,213 L210,210 L360,208 L510,211 L660,209" fill="none" stroke="var(--opt)" stroke-width="2" opacity="0.55" stroke-dasharray="2 5"/>
+          <text x="392" y="110" font-family="var(--mono)" font-size="10" fill="var(--slate)">休耕 σ⁰</text>
+          <text x="606" y="204" font-family="var(--mono)" font-size="10" fill="var(--slate)">休耕 NDVI</text>
+          <path d="M60,117 L210,224 L360,147 L510,86 L660,71" fill="none" stroke="var(--sar)" stroke-width="3.2" stroke-linejoin="round"/>
+          <path d="M60,251 L210,241 L360,174 L510,107 L660,101" fill="none" stroke="var(--opt)" stroke-width="3.2" stroke-linejoin="round" stroke-dasharray="9 5"/>
+          <line x1="60" y1="117" x2="60" y2="224" stroke="var(--ink)" stroke-width="1" stroke-dasharray="3 3"/>
+          <circle cx="60" cy="117" r="5" fill="var(--card)" stroke="var(--ink)" stroke-width="2"/>
+          <text x="70" y="105" font-family="var(--mono)" font-size="11" font-weight="600" fill="var(--ink)">4月＝基準値</text>
+          <text x="70" y="215" font-family="var(--mono)" font-size="11" font-weight="600" fill="var(--sar)">−5 dB 以上</text>
+          <g fill="var(--sar)"><circle cx="210" cy="224" r="4.5"/><circle cx="660" cy="71" r="4.5"/></g>
+          <g fill="var(--opt)"><circle cx="510" cy="107" r="4.5"/></g>
+        </svg>
+        <figcaption>模式図。σ⁰・NDVI の水準は Step3 の実測レンジに基づく</figcaption>
+      </figure>
+      <div class="legend">
+        <span><i class="swatch" style="border-top-color:var(--sar)"></i>作付 σ⁰ VH</span>
+        <span><i class="swatch" style="border-top-color:var(--opt);border-top-style:dashed"></i>作付 NDVI</span>
+        <span><i class="swatch" style="border-top-color:var(--muted);border-top-style:dotted"></i>休耕（両指標）</span>
+      </div>
+    </div>
+
+    <div class="col">
+      <h3>2センサを重ねる理由</h3>
+      <ul>
+        <li><b>光学単独では足りない</b>／6〜7月の曇天でデータが欠損し、生育期の変化を安定して追えない。実測で3ヶ月10枚のみ</li>
+        <li><b>SAR 単独でも足りない</b>／5月の湛水は捉えられても、7〜8月の「植生の質」（健全な生育か、単なる雑草か）を NDVI ほど直接的に判断できない</li>
+        <li><b>重ねると</b>／天候に左右されず（SAR）、かつ植生の活性度も評価できる（光学）</li>
+      </ul>
+      <h3>この仮説が崩れる条件</h3>
+      <ul>
+        <li><b>4月の基準値が無い</b>とき ── 急落は差分でしか定義できない</li>
+        <li><b>転作田</b>のとき ── 麦・大豆は湛水しないため σ⁰ の谷が出ない</li>
+        <li><b>非農地</b>を含むとき ── 水面・舗装面も鏡面反射で暗い</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>検出する季節イベントと観測量のペア</h3>
+  <table>
+    <thead><tr><th class="n">時期</th><th class="n">季節イベント</th><th class="n">観測量の変化</th><th>物理機構</th></tr></thead>
+    <tr><td class="n">4月</td><td class="n">代かき前・乾田</td><td class="n"><b>σ⁰ は中程度で安定</b></td><td>裸土の表面散乱。<b>判定の基準値</b>として位置づける</td></tr>
+    <tr><td class="n">5月</td><td class="n">湛水（代かき・田植え）</td><td class="n"><b>VH σ⁰ が急落</b></td><td>水面での鏡面反射により電波が衛星に戻らない</td></tr>
+    <tr><td class="n">7月</td><td class="n">生育</td><td class="n"><b>NDVI がピークへ上昇</b></td><td>葉の海綿状組織による近赤外の強い構造反射</td></tr>
+    <tr><td class="n">7〜8月</td><td class="n">生育最盛期</td><td class="n"><b>VH σ⁰ が急上昇</b></td><td>茎葉による体積散乱、および茎と水面のダブルバウンス</td></tr>
+    <tr><td class="n">通年</td><td class="n">休耕</td><td class="n"><b>両指標とも変化なし</b></td><td>湛水も繁茂も起こらないため季節変動が生じない</td></tr>
+  </table>
+  <p class="lead">5月の急落は4月との差分として初めて定義できるため、<b>4月は仮説の構成要素</b>である（Step3 参照）。</p>
+
+  <div class="foot"><span>Step 2 ／ 物理仮説</span><span>Team Alpha</span></div>
+</section>
+
+<!-- ═══ Step 3 ═══ -->
+<section class="page">
+  <div class="head">
+    <p class="step">Step 3 ／ 使用データと前処理（専門家観点）</p>
+    <h2>4月を外すと、急落は検出できない</h2>
+  </div>
+  <p class="lead">田植えは5月上旬〜中旬。<b>初観測 05-12 の時点で既に湛水している</b>可能性が高く、5月開始では比較対象の乾田が観測窓の外に出る。観測期間は<b>4月から</b>とする。</p>
+
+  <figure>
+    <svg viewBox="0 0 760 150" role="img" aria-label="2024年4月から8月の Sentinel-1 観測日 13回">
+      <line x1="40" y1="74" x2="740" y2="74" stroke="var(--rule)" stroke-width="1.5"/>
+      <rect x="34" y="30" width="128" height="60" fill="var(--ink)" opacity="0.05"/>
+      <text x="98" y="24" text-anchor="middle" font-family="var(--mono)" font-size="10.5" font-weight="600" fill="var(--slate)">4月（推定・未実測）</text>
+      <rect x="196" y="30" width="128" height="60" fill="var(--water)" opacity="0.10"/>
+      <text x="260" y="24" text-anchor="middle" font-family="var(--mono)" font-size="10.5" font-weight="600" fill="var(--water)">湛水期</text>
+      <g font-family="var(--mono)" font-size="9.5" fill="var(--slate)">
+        <g stroke="var(--muted)" stroke-width="1.6" fill="var(--card)">
+          <circle cx="40" cy="74" r="5" stroke-dasharray="2 2"/><circle cx="98" cy="74" r="5" stroke-dasharray="2 2"/><circle cx="156" cy="74" r="5" stroke-dasharray="2 2"/>
+        </g>
+        <g fill="var(--sar)"><circle cx="215" cy="74" r="5"/><circle cx="273" cy="74" r="5"/><circle cx="331" cy="74" r="5"/><circle cx="390" cy="74" r="5"/><circle cx="448" cy="74" r="5"/><circle cx="506" cy="74" r="5"/><circle cx="565" cy="74" r="5"/><circle cx="623" cy="74" r="5"/><circle cx="681" cy="74" r="5"/><circle cx="740" cy="74" r="5"/></g>
+        <text x="40" y="104" text-anchor="middle">04-06</text><text x="98" y="118" text-anchor="middle">04-18</text><text x="156" y="104" text-anchor="middle">04-30</text>
+        <text x="215" y="118" text-anchor="middle" fill="var(--ink)">05-12</text><text x="273" y="104" text-anchor="middle">05-24</text><text x="331" y="118" text-anchor="middle">06-05</text>
+        <text x="390" y="104" text-anchor="middle">06-17</text><text x="448" y="118" text-anchor="middle">06-29</text><text x="506" y="104" text-anchor="middle">07-11</text>
+        <text x="565" y="118" text-anchor="middle">07-23</text><text x="623" y="104" text-anchor="middle">08-04</text><text x="681" y="118" text-anchor="middle">08-16</text><text x="740" y="104" text-anchor="middle">08-28</text>
+      </g>
+      <text x="390" y="142" text-anchor="middle" font-family="var(--mono)" font-size="11" font-weight="600" fill="var(--slate)">13 観測 ／ 12日等間隔・欠測なし ／ 相対軌道番号 46 のみ</text>
+    </svg>
+    <figcaption>GEE 実測（2024年・DESCENDING）。4〜8月で13観測、5〜8月で10観測。4月分3観測の日付は12日間隔からの逆算による推定で、実測確認は未実施</figcaption>
+  </figure>
+
+  <div class="two">
+    <div class="col">
+      <h3>Sentinel-2（光学）</h3>
+      <ul>
+        <li>NDVI には <b>B8（NIR）と B4（Red）</b> を使用</li>
+        <li>CRS は <b>UTM（EPSG:32654）に統一</b>し、筆ポリゴンとのズレを防ぐ</li>
+        <li>雲量フィルタは <code>CLOUDY_PIXEL_PERCENTAGE &lt; 20</code></li>
+      </ul>
+      <h4>追加指標の使用方針</h4>
+      <p style="font-size:12.5px">B11（SWIR）など他バンドおよびそれらの演算による指標も利用しうる。ただし指標を増やして判断がしづらくなるのは本末転倒であるため、使用は次の2パターンに限定する。</p>
+      <ol style="font-size:12.5px">
+        <li>NDVI よりも詳細な判断が必要な場合</li>
+        <li>NDVI と 1 で追加した情報から予測できることを確認し、<b>バグチェックを行うためのデータ</b>として使う場合</li>
+      </ol>
+    </div>
+    <div class="col">
+      <h3>Sentinel-1（SAR）</h3>
+      <table>
+        <tr><th class="n">コレクション</th><td><code>COPERNICUS/S1_GRD</code></td></tr>
+        <tr><th class="n">偏波</th><td><b>VH</b>（体積散乱に敏感で生育状況を捉えやすい）</td></tr>
+        <tr><th class="n">観測モード</th><td><b>IW</b></td></tr>
+        <tr><th class="n">軌道方向</th><td><b>DESCENDING</b>（一方に統一することが要件）</td></tr>
+        <tr><th class="n">相対軌道番号</th><td><b>46</b></td></tr>
+        <tr><th class="n">単位</th><td>dB（σ⁰）。<code>10*log10()</code> の二重変換は行わない</td></tr>
+        <tr><th class="n">観測期間</th><td><b>4月〜8月</b></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <h3>【AIへの5つの問い】自チームの条件</h3>
+  <table>
+    <thead><tr><th class="n">問い</th><th>自チームの条件</th></tr></thead>
+    <tr><td class="n"><b>1. 単位</b></td><td><code>S1_GRD</code> は既に dB（σ⁰）。<code>10*log10()</code> の追加適用は行わない</td></tr>
+    <tr><td class="n"><b>2. バンド・偏波</b></td><td>NDVI＝(B8 − B4)/(B8 + B4)／SAR＝<code>VH</code>。HH は S-1 では使用不可。追加指標は上記2パターンに限定</td></tr>
+    <tr><td class="n"><b>3. CRS</b></td><td><code>EPSG:32654</code>（UTM 54N）に統一。筆ポリゴン（JGD2011）は再投影して揃える</td></tr>
+    <tr><td class="n"><b>4. 軌道・観測モード</b></td><td>DESCENDING・相対軌道番号 46・IW。2024年4〜8月の全13観測が軌道番号46であることを確認済み</td></tr>
+    <tr><td class="n"><b>5. 観測時期・雲量</b></td><td>観測期間 4月〜8月（4月は湛水前ベースラインとして必須）。S-2 は <code>CLOUDY_PIXEL_PERCENTAGE &lt; 20</code></td></tr>
+  </table>
+
+  <div class="foot"><span>Step 3 ／ 使用データと前処理（1/2）</span><span>Team Alpha</span></div>
+</section>
+
+<!-- ═══ Step 3 続き ═══ -->
+<section class="page">
+  <div class="head">
+    <p class="step">Step 3 ／ 使用データと前処理（続き）</p>
+    <h2>限界は「湛水を見逃す」ではなく「基準値が無い」</h2>
+  </div>
+
+  <div class="two">
+    <div class="col">
+      <h3>【限界】湛水前のベースラインが欠落するリスク</h3>
+      <p style="font-size:12.5px">福島浜通りの田植えは5月上旬〜中旬とされる。観測期間を5月開始とした場合、<b>初観測（05-12）の時点で既に湛水している可能性が高い</b>。比較対象となる乾田状態の観測が存在しないため、Step4-2 で定義する「急激な低下」を検出できない。実際には作付けされているにもかかわらず、急落が見えないために誤って休耕地と判定してしまう。</p>
+      <p style="font-size:12.5px">これが本設計における SAR 側の最大のリスクである。<b>観測期間に4月を含めることで、乾田状態のベースラインを確保して回避する。</b></p>
+      <blockquote>水稲の湛水は田植えから中干しまで数週間続くのが通例であり、12日間隔であれば2〜3回は観測できる。したがって<b>「湛水期間そのものを見逃す」リスクは小さく</b>、真のリスクは上記のベースライン欠落である。</blockquote>
+      <h4>残る限界と対策</h4>
+      <ul style="font-size:12.5px">
+        <li><b>生育確認時の追加指標</b>／NDVI 単独では雑草と作物の判別が難しい場合がある。B11（SWIR）等の併用が必要になる可能性（要検証）</li>
+        <li><b>生育期の雲被覆</b>／NDVI による生育確認の期間が雲で覆われた場合の扱いは未定。実測では2024年6〜8月の3ヶ月で雲量20%未満の S-2 シーンは10枚のみ。<b>追加検証が必要</b></li>
+      </ul>
+    </div>
+
+    <div class="col">
+      <h3>筆ポリゴン（農林水産省）</h3>
+      <p style="font-size:12.5px">農地1区画（1筆）ごとの境界線データ。用途は2つ。CRS（JGD2011）を <code>EPSG:32654</code> に再投影して使用する。</p>
+      <ol style="font-size:12.5px">
+        <li><b>範囲の限定</b>／農地以外（水域・市街地・森林）を解析対象から構造的に除外する</li>
+        <li><b>圃場単位の集計</b>／NDVI・σ⁰ を1筆内で平均し、画素単位のばらつきを低減する</li>
+      </ol>
+      <h4>W4 実測による裏付け（筆ポリゴンなしの結果）</h4>
+      <table>
+        <tr><th class="n">水域</th><td class="num">58.1 %</td></tr>
+        <tr><th class="n">市街地</th><td class="num">17.6 %</td></tr>
+        <tr><th class="n">草地・裸地・樹林</th><td class="num">15.8 %</td></tr>
+        <tr><th class="n" style="color:var(--opt)">農地</th><td class="num" style="color:var(--opt)"><b>8.5 %</b></td></tr>
+      </table>
+      <blockquote>ROI 全体へ閾値判定をかけた結果、検出画素の <b>91.5% が非農地</b>だった。水面と平滑な舗装面・屋根は鏡面反射で暗く、低 NDVI と重なると休耕農地と区別できない。また約200 m 離れた地点間で VH に <b>約3 dB</b> のばらつきがあり、画素単位の判定は原理的に不安定。</blockquote>
+    </div>
+  </div>
+
+  <h3>e-Stat（政府統計の総合窓口）</h3>
+  <div class="two-w">
+    <div class="col">
+      <table>
+        <thead><tr><th class="n">市町村コード</th><th class="n">市</th><th class="n">耕地面積</th><th class="n">田耕地面積</th><th class="n">田本地面積</th><th class="n">畑耕地面積</th></tr></thead>
+        <tr><td class="num">209</td><td class="n">相馬市</td><td class="num">3,260 ha</td><td class="num">2,630</td><td class="num">2,530</td><td class="num">632</td></tr>
+        <tr><td class="num">212</td><td class="n">南相馬市</td><td class="num">6,910 ha</td><td class="num"><b>5,690</b></td><td class="num">5,480</td><td class="num">1,220</td></tr>
+        <tr><td class="num">—</td><td class="n">2市合計</td><td class="num">10,170 ha</td><td class="num">8,320</td><td class="num">8,010</td><td class="num">1,852</td></tr>
+      </table>
+      <p style="font-size:11.5px;color:var(--slate)">統計名: 農林水産関係市町村別統計／統計項目: 耕地面積／年次: 令和6年（2024年）／対象: 福島県／ファイル: <code>d003-6-07-a001-01.xls</code>（statInfId=000040250161）／取得日: 2026-08-14</p>
+    </div>
+    <div class="col">
+      <h4>この統計の限界（利用上の注意より）</h4>
+      <ol style="font-size:12px">
+        <li>市町村別統計は<b>都道府県計値を市町村に配分して作成した加工統計</b>であり、市町村単位で直接測定された値ではない</li>
+        <li>属地統計。出作・入作は考慮しない</li>
+        <li>数値は3桁に四捨五入</li>
+      </ol>
+      <blockquote><b>正解データではなく参照データとして扱う。</b></blockquote>
+      <blockquote><span class="tag todo">未確認</span> 水稲作付面積（南相馬市 950 ha として引用）は上記ファイルに含まれない別系列の統計と考えられ、<b>出典が未特定</b>。Step5 一次検証の中心となる数値のため確定が必要。</blockquote>
+    </div>
+  </div>
+
+  <div class="foot"><span>Step 3 ／ 使用データと前処理（2/2）</span><span>Team Alpha</span></div>
+</section>
+
+<!-- ═══ Step 4 ═══ -->
+<section class="page">
+  <div class="head">
+    <p class="step">Step 4 ／ 解析手法</p>
+    <h2>判断がつかない筆を「要確認」に逃がす</h2>
+  </div>
+  <p class="lead"><b>選択した手法: 時系列解析。</b> Step2 の物理仮説は本質的に「時間軸に沿った変化のパターン」そのものであるため、2時点の差分（変化検出）ではなく、複数観測点をつなげた時系列解析によって最も直接的に検証できる。</p>
+  <p class="lead"><b>基本方針: 時系列ルールベース・2系統統合型。</b> 各筆について Sentinel-1（VH 時系列）と Sentinel-2（NDVI 時系列）の両方を取得し、両者を突き合わせて判定する。統合する理由は、Step3 で明記した SAR 側のベースライン欠落リスクを光学による生育確認で補うためである。</p>
+
+  <div class="two-w">
+    <div class="col">
+      <h3>処理パイプライン</h3>
+      <table>
+        <tr><th class="n">Step 4-0</th><td><b>範囲の限定</b>／筆ポリゴンで解析対象を農地に限定する。以降の集計はすべて筆単位で行う</td></tr>
+        <tr><th class="n">Step 4-1</th><td><b>軌道の固定</b>／DESCENDING・相対軌道番号46に統一。全13観測が軌道番号46であることを確認済みのため、単一入射角への固定が達成される</td></tr>
+        <tr><th class="n">Step 4-2</th><td><b>SAR側: 湛水イベントの検出</b>／VH σ⁰ の時系列（4月〜8月）を取得し、<b>4月の乾田状態を基準値</b>として、5月以降に <b>5 dB 以上</b>の落ち込みがあれば「推定湛水期」として記録</td></tr>
+        <tr><th class="n">Step 4-3</th><td><b>光学側: 生育開始の検出</b>／NDVI が閾値 <b>0.4</b> を超えた最初の日付を「推定生育開始日」として記録。雲量フィルタを通過したシーンのみ使用</td></tr>
+        <tr><th class="n">Step 4-4</th><td><b>統合・判定</b>／SAR と光学の結果を突き合わせ、3段階に分類する</td></tr>
+      </table>
+      <h3>3段階分類</h3>
+      <table>
+        <thead><tr><th class="n">分類</th><th>条件</th></tr></thead>
+        <tr><td class="n"><b>作付けの可能性が高い</b></td><td>SAR で明確な湛水シグナル（4月比 5 dB 以上の急落）が見られる筆</td></tr>
+        <tr><td class="n"><b>要確認</b></td><td>SAR では湛水シグナルが見られないが、その後 NDVI の上昇が確認できる筆。ベースライン欠落や転作の可能性がある。<b>SAR の限界を光学で補う、本設計の核となる分類</b></td></tr>
+        <tr><td class="n"><b>休耕の可能性が高い</b></td><td>SAR・光学のどちらにも変化が見られない筆</td></tr>
+      </table>
+    </div>
+
+    <div class="col">
+      <figure>
+        <svg viewBox="0 0 400 268" role="img" aria-label="3段階分類の判定フロー">
+          <g font-family="var(--body)" font-size="11.5">
+            <rect x="0" y="0" width="240" height="30" fill="var(--paper)" stroke="var(--rule)"/><text x="12" y="20" fill="var(--ink)">筆ポリゴンで農地に限定</text>
+            <line x1="30" y1="30" x2="30" y2="48" stroke="var(--rule)" stroke-width="1.5"/>
+            <rect x="0" y="48" width="240" height="30" fill="var(--paper)" stroke="var(--rule)"/><text x="12" y="68" fill="var(--ink)">VH 時系列を取得（4月＝基準）</text>
+            <line x1="30" y1="78" x2="30" y2="96" stroke="var(--rule)" stroke-width="1.5"/>
+            <rect x="0" y="96" width="240" height="30" fill="var(--card)" stroke="var(--sar)" stroke-width="1.5"/><text x="12" y="116" fill="var(--ink)">−5 dB 以上の急落あり？</text>
+            <path d="M240,111 L288,111 L288,140" fill="none" stroke="var(--opt)" stroke-width="1.5"/><text x="246" y="106" font-family="var(--mono)" font-size="10" font-weight="600" fill="var(--opt)">YES</text>
+            <line x1="30" y1="126" x2="30" y2="150" stroke="var(--rule)" stroke-width="1.5"/><text x="36" y="142" font-family="var(--mono)" font-size="10" font-weight="600" fill="var(--slate)">NO</text>
+            <rect x="0" y="150" width="240" height="30" fill="var(--card)" stroke="var(--opt)" stroke-width="1.5"/><text x="12" y="170" fill="var(--ink)">NDVI が 0.4 を超えた？</text>
+            <path d="M240,165 L288,165 L288,196" fill="none" stroke="var(--sar)" stroke-width="1.5"/><text x="246" y="160" font-family="var(--mono)" font-size="10" font-weight="600" fill="var(--sar)">YES</text>
+            <line x1="30" y1="180" x2="30" y2="222" stroke="var(--rule)" stroke-width="1.5"/><text x="36" y="200" font-family="var(--mono)" font-size="10" font-weight="600" fill="var(--slate)">NO</text>
+            <rect x="288" y="126" width="112" height="28" fill="var(--opt)"/><text x="296" y="145" fill="var(--card)" font-weight="700" font-size="11">作付け</text>
+            <rect x="288" y="182" width="112" height="28" fill="var(--sar)"/><text x="296" y="201" fill="var(--card)" font-weight="700" font-size="11">要確認</text>
+            <rect x="0" y="222" width="240" height="28" fill="var(--slate)"/><text x="12" y="241" fill="var(--card)" font-weight="700" font-size="11">休耕</text>
+          </g>
+        </svg>
+      </figure>
+      <h3>期待する出力</h3>
+      <ul style="font-size:12.5px">
+        <li>筆単位の3段階判別マップ（色分け）</li>
+        <li>「休耕」「要確認」筆のリスト（現地確認の優先順位づけ）</li>
+        <li>自治体単位の集計面積（一次検証および報告用）</li>
+      </ul>
+      <h3>なぜこの分類設計にしたか</h3>
+      <p style="font-size:12.5px">「衛星が休耕地と判定した場所に確認に行ったら実際は作付けされていた」という誤判定は、ツールへの信頼を損ない目的に逆行する。SAR 単独で判断がつかないケースを安易に「休耕地」に含めず、光学による補完情報がある限り「要確認」として独立させ、誤って休耕地に分類するリスクを抑える。</p>
+    </div>
+  </div>
+
+  <h3>判定と統計の対応は非対称</h3>
+  <div class="chips">
+    <div class="chip crop"><span class="chip-k">作付け</span><span>湛水を伴う＝実質的に<b>水稲</b>。<b>水稲作付面積と定義が整合し、一次検証に使える</b></span></div>
+    <div class="chip check"><span class="chip-k">要確認</span><span>ベースライン欠落、または湛水しない作物（麦・大豆等の転作）が入りうる</span></div>
+    <div class="chip fallow"><span class="chip-k">休耕</span><span><b>転作田が混入する。真の休耕とは一致しない。</b>分離には転作面積の統計による補正が必要</span></div>
+  </div>
+
+  <div class="foot"><span>Step 4 ／ 解析手法</span><span>Team Alpha</span></div>
+</section>
+
+<!-- ═══ Step 5 ═══ -->
+<section class="page">
+  <div class="head">
+    <p class="step">Step 5 ／ 検証・成功の定義</p>
+    <h2>目視は独立した検証にならない</h2>
+  </div>
+  <p class="lead">検証手段が被検証対象と同じデータ・同じ弱点を共有すると、循環した検証になる。Sentinel-2 の True Color 画像による目視は、<b>NDVI と同一センサ・同一シーン由来</b>であり、雲被覆という弱点も共有する。したがって衛星データと独立した情報源を軸に3層で構成する。</p>
+
+  <h3>一次検証: 集計面積と政府統計の突き合わせ（主検証）</h3>
+  <div class="two-w">
+    <div class="col">
+      <p style="font-size:12.5px">判定結果から算出した「作付けの可能性が高い」筆の合計面積を、<b>e-Stat の水稲作付面積</b>と突き合わせる。湛水検出は水稲を捉えるため、両者は定義が整合する。</p>
+      <p style="font-size:12.5px"><b>N 自治体への拡張。</b> 作付面積の統計は国内全市町村について整備されているため、相馬市・南相馬市に限らず適用できる。自治体を増やすことで（衛星推定値, 統計値）のペアが N 個得られ、単一の数値照合ではなく<b>校正データセット</b>になる。系統的なズレがあれば検出・補正できる。</p>
+    </div>
+    <div class="col">
+      <h4>成功の定義（暫定）</h4>
+      <table>
+        <tr><th class="n">絶対誤差</th><td>衛星推定の作付面積が統計値の <b>±30% 以内</b></td></tr>
+        <tr><th class="n">順位相関</th><td>N 自治体の作付率について統計値との<b>順位相関が正で有意</b>。絶対値より頑健で、自治体数が確保できれば主指標にする</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <h3>二次検証: 対照地による論理検証（バグチェック）</h3>
+  <p style="font-size:12.5px"><b>答えが物理的に確定している場所を検証地域に必ず含める。</b> 判定結果がその既知の答えと一致しなければ、実装にバグがあると判断できる。目視の役割はこのバグチェックに限定する。</p>
+  <table>
+    <thead><tr><th class="n">対照地</th><th>正しい判定</th><th>誤った場合に判明すること</th></tr></thead>
+    <tr><td class="n"><b>松川浦</b>（通年水面）</td><td>常に暗く季節変動を示さない。「5月だけ暗い作付地」と判定されてはならない</td><td>ROI・筆ポリゴンの適用範囲に農地以外が入っている</td></tr>
+    <tr><td class="n"><b>市街地</b></td><td>休耕と判定されてはならない</td><td>W4 で実測した誤検出（市街地17.6%）が解消できていない</td></tr>
+    <tr><td class="n"><b>森林</b></td><td>休耕と判定されてはならない</td><td>条件式または閾値が破綻している</td></tr>
+  </table>
+
+  <h3>三次検証: 浜通り被災自治体 × 複数年による校正と汎化検証</h3>
+  <div class="two">
+    <div class="col">
+      <p style="font-size:12.5px"><b>目的。</b> 復興段階が異なる被災地の実績値を使って閾値を経験的に校正し、判定の汎化性能を測る。対象は避難指示区域を含む浜通りの自治体群。同じ災害で被災し、復興段階がそれぞれ異なる。</p>
+      <table>
+        <tr><th class="n">浪江町</th><td class="num">2,360 ha</td><th class="n">双葉町</th><td class="num">698 ha</td></tr>
+        <tr><th class="n">飯舘村</th><td class="num">2,210 ha</td><th class="n">川内村</th><td class="num">674 ha</td></tr>
+        <tr><th class="n">新地町</th><td class="num">1,180 ha</td><th class="n">楢葉町</th><td class="num">632 ha</td></tr>
+        <tr><th class="n">大熊町</th><td class="num">1,080 ha</td><th class="n">葛尾村</th><td class="num">584 ha</td></tr>
+        <tr><th class="n">富岡町</th><td class="num">889 ha</td><th class="n">広野町</th><td class="num">295 ha</td></tr>
+      </table>
+      <p style="font-size:11.5px;color:var(--slate)">令和6年・耕地面積。これに相馬市・南相馬市を加える</p>
+    </div>
+    <div class="col">
+      <h4>設計</h4>
+      <table>
+        <tr><th class="n">空間</th><td>上記の被災自治体群（復興段階が異なる）</td></tr>
+        <tr><th class="n">時間</th><td>2015〜2024年（Sentinel-1 が利用可能な全期間）</td></tr>
+        <tr><th class="n">特徴量</th><td>自治体×年ごとの σ⁰ 時系列統計量（4月基準値、5月最小値、7〜8月最大値、振幅、湛水検出筆率）および NDVI 統計量</td></tr>
+        <tr><th class="n">ラベル</th><td>各自治体・各年の水稲作付面積 / 田耕地面積 ＝ 水稲作付率</td></tr>
+        <tr><th class="n">タスク</th><td>回帰（作付率の予測）。閾値の妥当性検証にも使う</td></tr>
+        <tr><th class="n">データ分割</th><td>学習 2015〜2021年 / 検証 2022〜2024年（<b>時間方向で分割し時空間リークを防ぐ</b>）</td></tr>
+      </table>
+      <blockquote>同一気候・同一作物・同一軌道番号46の範囲内で完結するため、地域差による交絡が小さい。<b>注意点:</b> 2016〜2021年は Sentinel-1B 稼働で観測間隔が6日（それ以外は12日）。年によって観測数が異なるため特徴量作成時に正規化が必要。</blockquote>
+    </div>
+  </div>
+
+  <h3>海外事例＋報道を採用しなかった理由</h3>
+  <table>
+    <thead><tr><th class="n">観点</th><th>海外＋報道</th><th>浜通り × 複数年</th></tr></thead>
+    <tr><td class="n">SAR アーカイブ</td><td>Sentinel-1 は2014年以降。震災（2011年）の復興初期が存在しない。ALOS/ALOS-2 は L-band で閾値が転移しない</td><td>2015年以降が全期間利用可能</td></tr>
+    <tr><td class="n">ラベルの粒度</td><td>報道は地区単位・日付が曖昧。筆単位のラベルにならない</td><td>自治体単位・年次で確定</td></tr>
+    <tr><td class="n">ラベルの偏り</td><td>報道は特筆すべき復興を扱うため成功例に偏る</td><td>統計なので網羅的</td></tr>
+    <tr><td class="n">定義の可比性</td><td>耕地面積・作付面積の定義が国ごとに異なる</td><td>全国統一</td></tr>
+    <tr><td class="n">ドメインシフト</td><td>作物・圃場規模・気候・入射角が異なる</td><td>同一気候・同一軌道</td></tr>
+    <tr><td class="n">復興段階の多様性</td><td>あり</td><td><b>あり</b>（自治体ごとに差がある）</td></tr>
+  </table>
+
+  <h3>限界の明記</h3>
+  <ul>
+    <li>一次検証は集計面積の照合であり、<b>個々の筆の判定が正しいかには答えられない</b></li>
+    <li>照合先の e-Stat 市町村別統計は都道府県計値からの按分による加工統計で、3桁に丸められている。正解データではない</li>
+    <li>「休耕」クラスには転作田（麦・大豆等）が混入する。真の休耕との分離には転作面積の統計による補正が必要（未実施）</li>
+    <li>三次検証のラベルも自治体単位の集計値であり、筆単位の教師データではない。<b>弱教師あり学習の枠組みになる</b></li>
+    <li>水稲作付面積の出典が未特定。一次検証の中心となる数値のため、確定が必要</li>
+  </ul>
+
+  <div class="foot"><span>Step 5 ／ 検証・成功の定義</span><span>Team Alpha</span></div>
+</section>
+
+<!-- ═══ Step 6 ═══ -->
+<section class="page">
+  <div class="head">
+    <p class="step">Step 6 ／ 社会実装・費用対効果</p>
+    <h2>報告値は前処理ひとつで桁が変わる</h2>
+  </div>
+
+  <div class="two">
+    <div class="col">
+      <h3>主な利用者と価値</h3>
+      <h4>1. 農業委員会・農政担当者</h4>
+      <p style="font-size:12.5px">毎年広大な農地を現地確認する必要があり、大きな労力とコストがかかっている。3段階分類を使えば現地確認の優先順位づけができ、「休耕の可能性が高い」農地から優先的に確認することで、全農地を一律に歩く従来のやり方より効率化できる。</p>
+      <h4>2. 農地利用予定者（新規就農者・農業法人など）</h4>
+      <p style="font-size:12.5px">現地を訪れる前に候補地の農地利用状況を把握できる一次的な判断材料となる。ただし本ツールは精度保証を行っておらず、特に「要確認」に分類された農地を投資判断のような重い意思決定にそのまま使うべきではない。<b>現地訪問すべき候補地を絞り込む一次スクリーニング</b>として位置づけ、最終的な判断は現地確認や自治体への問い合わせと組み合わせる。</p>
+    </div>
+    <div class="col">
+      <h3>自治体（非専門家）が使える形にする工夫</h3>
+      <p style="font-size:12.5px">MVP は3段階分類の地図出力。GIS やリモートセンシングの専門知識がなくても、色分けされた地図を見るだけで「どこを優先的に確認すべきか」を判断できる設計を目指す。</p>
+      <p style="font-size:12.5px">加えて、<b>三次検証で得られる「SAR の判定結果 ↔ 実際の利用状況」の対応関係を併せて示す。</b> 復興段階の異なる自治体で判定結果が実績とどう対応したかを提示できれば、非専門家でも判定の信頼度を実感的に理解できる。</p>
+      <blockquote>ただし閾値（σ⁰ の 5 dB 落ち込み、NDVI 0.4 など）の妥当性検証や年ごとの調整は、専門知識を持つ担当者が継続的に行う必要がある。</blockquote>
+      <h3>費用対効果</h3>
+      <p style="font-size:12.5px">Sentinel-1・Sentinel-2 はいずれも無料で公開されており、GEE も研究・非営利目的であれば無料枠で利用できる。追加コストは主に解析用の人員（データ処理・検証）であり、毎年の全農地現地確認に比べると継続的な運用コストは小さいと見込まれる。ただし初期のシステム構築・筆ポリゴンデータの整備・検証作業には一定の人的コストがかかる。</p>
+    </div>
+  </div>
+
+  <h3>社会実装の6項目</h3>
+  <table>
+    <thead><tr><th class="n">#</th><th class="n">項目</th><th>記入</th></tr></thead>
+    <tr><td class="n">①</td><td class="n">誰が使う？</td><td>相馬市・南相馬市の農業委員会・農政担当者（主）／農地利用予定者（新規就農者・農業法人）（副）</td></tr>
+    <tr><td class="n">②</td><td class="n">何を減らす？</td><td>全農地を一律に現地確認する労力。3段階分類による優先順位づけで確認対象を絞り込む</td></tr>
+    <tr><td class="n">③</td><td class="n">何を出す？</td><td>筆単位の3段階判別マップ＋「休耕」「要確認」筆のリスト＋自治体単位の集計面積</td></tr>
+    <tr><td class="n">④</td><td class="n">どの程度の精度が必要？</td><td><span class="tag todo">暫定</span> 「休耕」判定の <b>Precision ≥ 0.8</b>（現地確認して実際に休耕である割合）。「休耕＋要確認」の合計で真の休耕に対する <b>Recall ≥ 0.9</b>（見落とし率10%以下）。集計面積は統計値の ±30% 以内</td></tr>
+    <tr><td class="n">⑤</td><td class="n">どの程度の業務削減を目指す？</td><td><code>C_To-Be = C_satellite + r × N × c_field</code>。要確認率 r ＝（休耕＋要確認）筆数 ÷ 全筆数 は<b>未測定</b>。r = 0.2 / 0.3 / 0.5 の3水準で感度を試算し、削減効果が成立する r の上限を求める</td></tr>
+    <tr><td class="n">⑥</td><td class="n">失敗したとき誰が困る？</td><td>「休耕」と誤判定された農地の耕作者（不要な問い合わせを受ける）。確認に行った担当者がツールへの信頼を失う。逆に「作付け」と誤判定して確認対象から外した場合、休耕農地の見落としが発生し農地の適正管理ができなくなる</td></tr>
+  </table>
+
+  <h3>非専門家への伝え方 ── W4 の教訓</h3>
+  <blockquote>筆ポリゴンで範囲を限定するかどうかで、報告値が <b>約4,039 ha と約338 ha（約12倍）</b>変わった。前処理の1つの選択で桁が変わる以上、「何 ha でした」だけを伝えるのは専門家にも非専門家にも不誠実になる。<b>数値には必ず、対象範囲・出典・年次・誤差要因を添える。</b></blockquote>
+
+  <h3>実装上の限界・今後の課題</h3>
+  <ul>
+    <li>一次検証は集計面積の照合であり、筆単位の正しさは検証できない</li>
+    <li>三次検証のラベルは自治体単位・年次の集計値であり、弱教師あり学習の枠組みになる</li>
+    <li>転作田と真の休耕の分離は未解決</li>
+    <li>Sentinel-1B 稼働期間（2016〜2021年）は観測間隔が6日で、他期間と観測数が異なる。特徴量の正規化が必要</li>
+    <li>生育期が雲で覆われた場合の NDVI 欠損への対処は未定</li>
+    <li>営農計画書等の申請情報との突き合わせは本フェーズのスコープ外とし、次フェーズの課題とする</li>
+  </ul>
+
+  <div class="foot"><span>Step 6 ／ 社会実装・費用対効果</span><span>Team Alpha</span></div>
+</section>
+
+<!-- ═══ 技術的相談事項 ═══ -->
+<section class="page">
+  <div class="head">
+    <p class="step">付 ／ 技術的相談事項</p>
+    <h2>閾値の妥当性と、転作田の分離</h2>
+  </div>
+
+  <h3>相談1: 湛水検出の基準値と閾値の実務的な定義</h3>
+  <table>
+    <tr><th class="n">状況</th><td>湛水の判定を「4月の乾田状態を基準として 5 dB 以上の低下」と設計した。ROI 内の観測は12日等間隔（2024年4〜8月で13観測、すべて相対軌道番号46）であることを GEE で確認済み。</td></tr>
+    <tr><th class="n">仮説</th><td>4月を基準に含めなければ、初観測（05-12）時点で既に湛水していて急落が検出できない。また実測では約200 m 離れた地点間で VH に約3 dB の空間ばらつきがあり、5 dB は筆単位で平均しなければノイズと分離できない水準だと考えている。</td></tr>
+    <tr><th class="n">確認したいこと</th><td><b>圃場単位で平均した後、5 dB という閾値は妥当か。実務では湛水をどの指標・どの水準で定義しているか。</b></td></tr>
+  </table>
+
+  <h3>相談2: 転作田と真の休耕の分離</h3>
+  <table>
+    <tr><th class="n">状況</th><td>湛水検出は物理的に水稲を捉えるため、田で麦・大豆等を作る転作田は湛水せず「休耕」側に落ちる。南相馬市は田耕地面積 5,690 ha に対し水稲作付面積 950 ha（出典未特定）で、差が非常に大きい。</td></tr>
+    <tr><th class="n">仮説</th><td>この差の大部分は転作であって休耕ではないと考えている。転作面積の統計で補正するか、NDVI 時系列の形状（水稲と麦・大豆で立ち上がり時期が違う）で分離できるのではないか。</td></tr>
+    <tr><th class="n">確認したいこと</th><td><b>実務では転作田と休耕をどう分離しているか。衛星データだけで可能か、申請情報との突き合わせが前提になるか。</b></td></tr>
+  </table>
+
+  <h3>提出前に確定が必要な事項</h3>
+  <table>
+    <thead><tr><th class="n">#</th><th class="n">項目</th><th>内容</th></tr></thead>
+    <tr><td class="n">1</td><td class="n">水稲作付面積の出典</td><td>950 ha の統計名・表番号・年次が未特定。Step5 一次検証の中心となる数値</td></tr>
+    <tr><td class="n">2</td><td class="n">4月分3観測の日付</td><td>04-06 / 04-18 / 04-30 は12日間隔からの逆算による推定。GEE で実測確認が必要</td></tr>
+    <tr><td class="n">3</td><td class="n">ROI 東端</td><td>経度 141.02 は海岸線より東で海域を含む。見直しが必要</td></tr>
+    <tr><td class="n">4</td><td class="n">要確認率 r</td><td>社会実装⑤の費用対効果試算に必要。未測定</td></tr>
+  </table>
+
+  <div class="foot"><span>付 ／ 技術的相談事項</span><span>Team Alpha ／ 永島柊平・五味那奈・松井博史</span></div>
+</section>
+
+</div>
