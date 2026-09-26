@@ -1,0 +1,20 @@
+[project]
+name = "astrocamp-2026-sia"
+version = "0.1.0"
+description = "Astro Camp 2026 - 衛星データ解析ゼミ"
+requires-python = ">=3.11"
+dependencies = [
+    "earthengine-api",
+    "geemap",
+    "geopandas",
+    "scikit-learn",
+    "numpy",
+    "pandas",
+    "matplotlib",
+    "rasterio",
+    "folium",
+    "jupyter",
+    "python-pptx>=1.0.2",
+    "jaxa-earth>=0.1.6",
+    "mcp>=1.0.0",
+]
