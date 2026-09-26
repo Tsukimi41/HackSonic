@@ -1,0 +1,53 @@
+{
+  "datasetVersion": "2026-09-27.1",
+  "generatedAt": "2026-09-27T00:00:00+09:00",
+  "region": "minamisoma_east",
+  "regionLabel": "南相馬市東部（確定ROI）",
+  "roi": [
+    141.005,
+    37.608,
+    141.033,
+    37.62
+  ],
+  "baselineYear": 2024,
+  "targetYear": 2025,
+  "observationYears": [
+    2024,
+    2025
+  ],
+  "polygonVintage": 2026,
+  "crs": "EPSG:4326",
+  "fieldCount": 275,
+  "methodVersion": "rules-v1",
+  "relativeOrbitNumberStart": 46,
+  "orbitPass": "DESCENDING",
+  "syntheticDeclarationSeed": 20260927,
+  "thresholds": {
+    "sarFloodDropDb": 9.0,
+    "ndviGrowthRise": 0.2,
+    "ndviPeak": 0.5,
+    "ndviHarvestDrop": 0.25
+  },
+  "cloudMask": {
+    "sceneCloudPercent": 20,
+    "fallbackSceneCloudPercent": 30,
+    "cloudProbabilityMax": 40,
+    "maskBufferMeters": 20
+  },
+  "sourceObservationRange": {
+    "start": "2024-01-01",
+    "end": "2025-12-31"
+  },
+  "dataMode": "official_polygons_reproducible_simulated_observations",
+  "notices": [
+    "圃場境界は農林水産省2026年筆ポリゴンをROI切り出し・加工",
+    "衛星時系列と営農申告はアルゴリズム・UI実演用の再現可能な模擬データ",
+    "実在圃場の作付・休耕や行政判断を示さない"
+  ],
+  "declarationScenarioCounts": {
+    "match": 138,
+    "mismatch": 69,
+    "unavailable": 41,
+    "not_comparable": 27
+  }
+}
