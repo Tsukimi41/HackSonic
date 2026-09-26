@@ -32,11 +32,19 @@ def stable_noise(field_id: str, year: int, index: int, scale: float) -> float:
 
 
 def scenario_for(field_id: str, year: int) -> str:
-    value = int(hashlib.sha256(f"scenario|{field_id}|{year}".encode()).hexdigest()[:8], 16) % 100
-    if value < 37: return "paddy"
-    if value < 68: return "upland"
-    if value < 84: return "fallow"
-    if value < 92: return "conflict"
+    base_value = int(hashlib.sha256(f"scenario-base|{field_id}".encode()).hexdigest()[:8], 16) % 100
+    base = "paddy" if base_value < 45 else "upland" if base_value < 80 else "fallow" if base_value < 92 else "conflict" if base_value < 97 else "insufficient"
+    if year == 2024:
+        return base
+    transition = int(hashlib.sha256(f"scenario-change|{field_id}".encode()).hexdigest()[:8], 16) % 100
+    if transition < 82:
+        return base
+    if transition < 88:
+        return "upland" if base == "paddy" else "paddy"
+    if transition < 94:
+        return "fallow" if base in {"paddy", "upland"} else "paddy"
+    if transition < 98:
+        return "conflict"
     return "insufficient"
 
 

@@ -29,10 +29,10 @@
       "value": null,
       "changed_fields": 0,
       "status_counts": {
-        "review_required": 97,
-        "fallow_candidate": 33,
-        "cultivation_signal": 127,
-        "insufficient_observation": 18
+        "review_required": 103,
+        "cultivation_signal": 133,
+        "fallow_candidate": 30,
+        "insufficient_observation": 9
       }
     },
     {
@@ -40,21 +40,21 @@
       "value": 7,
       "changed_fields": 0,
       "status_counts": {
-        "review_required": 97,
-        "fallow_candidate": 33,
-        "cultivation_signal": 127,
-        "insufficient_observation": 18
+        "review_required": 103,
+        "cultivation_signal": 133,
+        "fallow_candidate": 30,
+        "insufficient_observation": 9
       }
     },
     {
       "parameter": "sar_flood_drop_db",
       "value": 11,
-      "changed_fields": 81,
+      "changed_fields": 86,
       "status_counts": {
-        "review_required": 150,
+        "review_required": 155,
         "fallow_candidate": 47,
-        "cultivation_signal": 60,
-        "insufficient_observation": 18
+        "cultivation_signal": 64,
+        "insufficient_observation": 9
       }
     },
     {
@@ -62,10 +62,10 @@
       "value": 0.15,
       "changed_fields": 0,
       "status_counts": {
-        "review_required": 97,
-        "fallow_candidate": 33,
-        "cultivation_signal": 127,
-        "insufficient_observation": 18
+        "review_required": 103,
+        "cultivation_signal": 133,
+        "fallow_candidate": 30,
+        "insufficient_observation": 9
       }
     },
     {
@@ -73,10 +73,10 @@
       "value": 0.25,
       "changed_fields": 0,
       "status_counts": {
-        "review_required": 97,
-        "fallow_candidate": 33,
-        "cultivation_signal": 127,
-        "insufficient_observation": 18
+        "review_required": 103,
+        "cultivation_signal": 133,
+        "fallow_candidate": 30,
+        "insufficient_observation": 9
       }
     },
     {
@@ -84,10 +84,10 @@
       "value": 0.45,
       "changed_fields": 0,
       "status_counts": {
-        "review_required": 97,
-        "fallow_candidate": 33,
-        "cultivation_signal": 127,
-        "insufficient_observation": 18
+        "review_required": 103,
+        "cultivation_signal": 133,
+        "fallow_candidate": 30,
+        "insufficient_observation": 9
       }
     },
     {
@@ -95,10 +95,10 @@
       "value": 0.55,
       "changed_fields": 0,
       "status_counts": {
-        "review_required": 97,
-        "fallow_candidate": 33,
-        "cultivation_signal": 127,
-        "insufficient_observation": 18
+        "review_required": 103,
+        "cultivation_signal": 133,
+        "fallow_candidate": 30,
+        "insufficient_observation": 9
       }
     },
     {
@@ -106,21 +106,21 @@
       "value": 0.2,
       "changed_fields": 0,
       "status_counts": {
-        "review_required": 97,
-        "fallow_candidate": 33,
-        "cultivation_signal": 127,
-        "insufficient_observation": 18
+        "review_required": 103,
+        "cultivation_signal": 133,
+        "fallow_candidate": 30,
+        "insufficient_observation": 9
       }
     },
     {
       "parameter": "ndvi_harvest_drop",
       "value": 0.3,
-      "changed_fields": 59,
+      "changed_fields": 64,
       "status_counts": {
-        "review_required": 156,
-        "fallow_candidate": 33,
-        "cultivation_signal": 68,
-        "insufficient_observation": 18
+        "review_required": 167,
+        "cultivation_signal": 69,
+        "fallow_candidate": 30,
+        "insufficient_observation": 9
       }
     }
   ],
