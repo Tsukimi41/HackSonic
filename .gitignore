@@ -1,0 +1,41 @@
+AGENTS.md
+CLAUDE.md
+
+# Python
+__pycache__/
+*.pyc
+.Python
+
+# Virtual environment
+.opencode/
+.venv/
+
+# Frontend build/dependencies
+node_modules/
+dist/
+*.tsbuildinfo
+vite.config.js
+vite.config.d.ts
+
+# Downloaded/temporary source material
+tmp/
+# OS
+.DS_Store
+Thumbs.db
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Private teaching materials (not yet released)
+_private/
+
+# 解析の実行結果（ノート実行時に生成される成果物。リポジトリにはコミットしない）
+tutorials/field_features.csv
+tutorials/fields.geojson
+tutorials/validation_labels.csv
+tutorials/priority_check_list.csv
+tutorials/fukushima_field_results.*
+
+# team-gamma: GEEパイプラインの生成物（スクリプトを再実行すれば作れるため追跡しない）
+submissions/camp/team-gamma/*.csv
+submissions/camp/team-gamma/*.html
