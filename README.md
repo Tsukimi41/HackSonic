@@ -1,4 +1,49 @@
-# 衛星データ解析
+# そらまもり農地 — 衛星データによる作付確認支援
+
+南相馬市の自治体職員が、営農計画書提出後の作付確認で現地調査すべき農地を絞り込む静的Webアプリです。Sentinel-1 VHの湛水変化とSentinel-2 NDVIの生育・収穫変化を筆単位で説明し、2024年と2025年を比較します。
+
+> [!IMPORTANT]
+> 同梱デモは、農林水産省2026年筆ポリゴンの実形状を使いますが、衛星時系列と営農申告は固定seedで作った模擬データです。実在圃場の作付・休耕や精度を示さず、行政判断には使用できません。
+
+## Webアプリを起動する
+
+Node.js 22以上を使用します。
+
+```powershell
+npm install
+npm run dev
+```
+
+表示された `http://127.0.0.1:5173/` をChromeまたはEdgeで開きます。外部APIやログインは不要です。背景のOpenStreetMapタイルが停止しても、圃場レイヤ、一覧、詳細、候補CSV、試算は利用できます。
+
+## 実装済みの業務フロー
+
+- 275筆の状態・面積・確信度・年次変化による絞り込み
+- MapLibre地図と圃場一覧・詳細の選択同期
+- 2024/2025比較、NDVI/VH時系列、理由コード、観測品質の表示
+- デモ用架空申告との一致・不一致・比較不能の表示
+- 現地確認候補の追加・削除・`localStorage`保持
+- UTF-8 BOM、CRLF、固定24列、数式インジェクション対策済みCSV
+- 条件を変更できる調査時間・費用シナリオ
+- 判定閾値、感度分析、出典、限界の公開
+- 360px以上のレスポンシブ表示とキーボード操作
+
+## 検証
+
+```powershell
+npm run test
+npm run test:e2e
+npm run build
+$env:PYTHONPATH='pipeline'
+.venv\Scripts\python.exe -m pytest pipeline\tests -q
+.venv\Scripts\python.exe pipeline\validate_outputs.py
+```
+
+解析の再生成と実観測への切替は [`pipeline/README.md`](pipeline/README.md)、確定要件は [`要件定義.md`](要件定義.md)、UI原則は [`design.md`](design.md) を参照してください。
+
+---
+
+# 衛星データ解析教材
 
 光学とSARの基礎から、生成AIで正しいコードを書く方法、結果を検証するファクトチェック、社会課題への提案まで。現場さながらのワークフローを体験する5日間。
 
