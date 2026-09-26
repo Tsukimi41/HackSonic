@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:e2e": "playwright test",
     "data:generate": ".venv\\Scripts\\python.exe pipeline\\generate_demo.py --fgb tmp\\user-polygons\\minamisoma-2026\\2026_072125.json",
     "test:python": "set PYTHONPATH=pipeline&& .venv\\Scripts\\python.exe -m pytest pipeline\\tests -q"
   },
@@ -19,6 +20,7 @@
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.1.0",
     "@types/geojson": "^7946.0.16",
