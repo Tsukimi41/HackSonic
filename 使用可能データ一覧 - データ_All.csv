@@ -1,0 +1,19 @@
+優先度,データ名,提供元,カテゴリ,リンク,内容,どのように役立つか,主な利用タイミング,注意点
+最重要,Sentinel-2 L2A Surface Reflectance（Harmonized）,Google Earth Engine / Copernicus,光学・時系列,https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED,地表反射率。B4（Red）、B8（NIR）、B11/B12（SWIR）などを利用でき、植生・土壌・水域の状態を時系列で観測できる。,NDVIによる生育量の把握、作付地と休耕地の季節パターン比較。SARだけでは得にくい植生情報を補う中核データ。,B4/B8、雲、反射率スケール、CRSを確認。,HARMONIZEDを使う。反射率は10000倍スケール。
+重要,Sentinel-2 Cloud Probability,Google Earth Engine / Copernicus,光学前処理,https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_CLOUD_PROBABILITY,各10m画素の雲らしさを0〜100で表すデータ。,雲・雲影によるNDVI低下を作付変化と誤認するリスクを低減し、時系列を安定させる。,S-2時系列作成前の雲マスク。,高反射面も高確率になり得るため、機械的な除去だけで判断しない。
+最重要,Sentinel-1 GRD（C-band SAR）,Google Earth Engine / Copernicus,SAR・時系列,https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S1_GRD,C-band（5.405 GHz）のGRD。VV/VH、IW、ASC/DESCなどのメタデータを持ち、GEEのS1_GRDはdBスケール。,水田の湛水期の後方散乱低下、生育に伴うVH/VV変化、光学が雲で欠測する期間の補完。作付/休耕判別の中核。,IW、VV/VH、ASC/DESC統一、dB二重変換、スペックルを検証。,異なる軌道方向の混在は時系列比較にノイズを入れ得る。
+最重要,筆ポリゴン（2026年・福島県）,農林水産省,農地ポリゴン,https://www.maff.go.jp/j/tokei/census/shuraku_data/2025/mb/index.html,農地の区画（筆）のGISポリゴン。2026年版では福島県データが公開されている。,S-1/S-2の画素を1筆単位に集約するZonal Statisticsの基礎。圃場単位の時系列特徴量を作ることで画素ノイズを抑える。,GEE/GeoPandasで農地ポリゴンを扱う。,休耕・作付の正解ラベルではない。位置ずれ・形状差にも注意。福島県データは大容量。
+重要,eMAFF農地ナビ,農林水産省,農地情報・目視検証,https://map.maff.go.jp/,農地ポリゴン・筆ポリゴン等を地図上で確認でき、GeoJSON等のダウンロードにも対応。,20〜30筆程度の目視検証セット作成、衛星判定と実際の農地状態の照合、誤分類のFP/FN診断に使える。,validation_labels.csv作成、目視確認。,参考情報であり、衛星観測時点の完全な真値ラベルではない。
+重要,2020年農林業センサス（福島県）,e-Stat / 農林水産省,地域統計,https://www.e-stat.go.jp/stat-search/files?cycle=7&layout=datalist&page=1&second=1&tclass1=000001147146&tclass2=000001155386&tclass3=000001160949&tclass4val=0&toukei=00500209&tstat=000001032920,福島県の農業経営体・農山村地域などの統計。相馬市・南相馬市や農業集落相当の地域区分を含む表がある。,解析対象候補エリアの選定、農業構造の背景説明、衛星で見た変化を地域統計と結び付ける。,e-Stat調査、解析計画、最終発表の背景。,統計時点の地域情報であり、筆単位の作付/休耕ラベルではない。
+重要,国土数値情報 農業地域データ,国土交通省,農業地域・土地利用規制,https://nlftp.mlit.go.jp/,農業振興地域等の農業政策上の地域情報をGISデータとして扱うための基礎情報。,解析対象農地の候補地域を絞る／農業上の位置づけを確認する。衛星解析結果を行政施策につなげる際の背景情報にもなる。,対象地域選定、データ選択、最終発表,「現在作付されているか」「休耕しているか」を直接示すデータではない。制度上の区域と実際の土地利用を混同しない。
+補助,気象庁 過去の気象データ（相馬）,気象庁,気象・時系列,https://www.data.jma.go.jp/stats/etrn/,降水量、気温、湿度、日照などの過去観測データを確認できる。,NDVI/SARの変化が作付状態ではなく天候要因ではないかを確認する補助情報。光学観測条件の背景説明にも使える。,時系列異常値・外れ値の原因分析。,観測点と圃場は離れるため、局所気象の完全な代表とは限らない。
+補助,基盤地図情報 数値標高モデル（DEM）,国土地理院,地形,https://service.gsi.go.jp/kiban/,1m・5m・10mメッシュ等の標高データ。,地形による水分状態やSAR後方散乱の違いなど、誤分類の原因候補を追加検討できる。,物理ファクトチェック、誤分類エリア分析。,主課題では必須ではない。解像度・CRS・取得時期を確認して使う。
+補助,国土数値情報 土地利用細分メッシュ,国土交通省,土地利用・GIS,https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-L03-b-v3_1.html,全国を100mメッシュに区切り、「田」「その他の農用地」「森林」「荒地」「建物用地」などの土地利用区分を整備。最新は2021年度。,Sentinel-1/2で抽出した圃場周辺の土地利用を確認し、誤判定の背景要因や周辺環境を把握する。土地利用変化の比較にも利用可能。,データ選定、解析結果の解釈・ファクトチェック,100mメッシュなので圃場単位には粗い。衛星の10m画像や筆ポリゴンの正解ラベルとして直接使わない。整備年度にも注意。
+補助,国土数値情報 土地利用3次メッシュ,国土交通省,土地利用・統計GIS,https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-L03-a-v3_1.html,100mメッシュ単位で土地利用区分ごとの面積を集計したデータ。(National Land Transportation Portal),解析対象地域の田・その他農用地等の面積構成を定量化し、地域間比較や対象地域選定に使える。,対象地域選定、解析計画,ピクセル単位ではなくメッシュ集計値。Sentinel画像との直接的な1対1対応には注意。
+解析基盤,Google Earth Engine（Python API / geemap）,Google,解析プラットフォーム,https://developers.google.com/earth-engine,S-1/S-2などの大規模データを検索・フィルタ・時系列化し、Google ColabからPythonで解析できる基盤。,データ取得、前処理、NDVI/SAR特徴量、圃場集計、可視化までを再現可能なワークフローにまとめる。,実装・再現性確保。,コードが動くことと物理的に正しいことは別。バンド・単位・CRS・軌道・偏波を検証する。
+検証,Google Earth,Google,目視検証・背景確認,https://earth.google.com/,高解像度の衛星画像や地図を用いて対象圃場の形状・周辺土地利用・現地状況を目視確認するための補助ツール。,衛星判定のFP/FNを実際の景観と照合し、誤分類が「農地形状」「周辺土地利用」「季節状態」などに由来するかを考える材料にする。,20〜30筆の目視検証セット作成。,衛星観測日時とGoogle Earthの画像取得時期は一致しない場合があるため、時点差を明記する。
+,,,,,,,,
+この課題での位置づけ,,,,,,,,
+最優先,S-2 SR Harmonized / S-1 GRD / 筆ポリゴン,解析本体,,,,,,
+検証,eMAFF + 目視確認,衛星による判定を、圃場単位・現場の見え方と照合,,,,,,
+背景・補助,e-Stat + 気象庁 + 必要に応じDEM,地域背景、気象による変動、地形要因を説明,,,,,,
