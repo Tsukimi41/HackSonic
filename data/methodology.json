@@ -1,0 +1,142 @@
+{
+  "thresholds": {
+    "sar_flood_drop_db": 9.0,
+    "ndvi_growth_rise": 0.2,
+    "ndvi_peak": 0.5,
+    "ndvi_harvest_drop": 0.25,
+    "near_sar_db": 1.5,
+    "near_ndvi": 0.05
+  },
+  "requiredObservations": {
+    "sar_pre": 2,
+    "sar_flood": 2,
+    "ndvi_may": 2,
+    "ndvi_growing": 3,
+    "ndvi_growing_months": 2,
+    "ndvi_post_peak": 2
+  },
+  "fieldAggregation": {
+    "inner_buffer_meters": 5,
+    "fallback_area_m2": 200,
+    "minimum_valid_pixels": 3,
+    "minimum_valid_ratio": 0.5,
+    "small_field_severe_ha": 0.05,
+    "small_field_warning_ha": 0.1
+  },
+  "sensitivity": [
+    {
+      "parameter": "基準",
+      "value": null,
+      "changed_fields": 0,
+      "status_counts": {
+        "review_required": 136,
+        "cultivation_signal": 48,
+        "insufficient_observation": 76,
+        "fallow_candidate": 15
+      }
+    },
+    {
+      "parameter": "sar_flood_drop_db",
+      "value": 7,
+      "changed_fields": 16,
+      "status_counts": {
+        "review_required": 150,
+        "cultivation_signal": 34,
+        "insufficient_observation": 76,
+        "fallow_candidate": 15
+      }
+    },
+    {
+      "parameter": "sar_flood_drop_db",
+      "value": 11,
+      "changed_fields": 5,
+      "status_counts": {
+        "review_required": 131,
+        "cultivation_signal": 53,
+        "insufficient_observation": 76,
+        "fallow_candidate": 15
+      }
+    },
+    {
+      "parameter": "ndvi_growth_rise",
+      "value": 0.15,
+      "changed_fields": 7,
+      "status_counts": {
+        "review_required": 143,
+        "cultivation_signal": 48,
+        "insufficient_observation": 76,
+        "fallow_candidate": 8
+      }
+    },
+    {
+      "parameter": "ndvi_growth_rise",
+      "value": 0.25,
+      "changed_fields": 7,
+      "status_counts": {
+        "review_required": 131,
+        "cultivation_signal": 47,
+        "insufficient_observation": 76,
+        "fallow_candidate": 21
+      }
+    },
+    {
+      "parameter": "ndvi_peak",
+      "value": 0.45,
+      "changed_fields": 42,
+      "status_counts": {
+        "review_required": 98,
+        "cultivation_signal": 88,
+        "insufficient_observation": 76,
+        "fallow_candidate": 13
+      }
+    },
+    {
+      "parameter": "ndvi_peak",
+      "value": 0.55,
+      "changed_fields": 42,
+      "status_counts": {
+        "review_required": 176,
+        "cultivation_signal": 7,
+        "insufficient_observation": 76,
+        "fallow_candidate": 16
+      }
+    },
+    {
+      "parameter": "ndvi_harvest_drop",
+      "value": 0.2,
+      "changed_fields": 3,
+      "status_counts": {
+        "review_required": 137,
+        "cultivation_signal": 47,
+        "insufficient_observation": 76,
+        "fallow_candidate": 15
+      }
+    },
+    {
+      "parameter": "ndvi_harvest_drop",
+      "value": 0.3,
+      "changed_fields": 15,
+      "status_counts": {
+        "review_required": 141,
+        "cultivation_signal": 43,
+        "insufficient_observation": 76,
+        "fallow_candidate": 15
+      }
+    }
+  ],
+  "reasonLabels": {
+    "SAR_FLOOD_DROP": "湛水期にVHが基準期間から9 dB以上低下しました",
+    "NO_SAR_FLOOD_SIGNAL": "9 dB以上の湛水低下は確認されませんでした",
+    "NDVI_GROWTH_RISE": "生育前からNDVIが0.20以上上昇しました",
+    "NDVI_PEAK_REACHED": "生育期NDVIが0.50以上に達しました",
+    "NDVI_HARVEST_DROP": "ピーク後にNDVIが0.25以上低下しました",
+    "NDVI_PEAK_LOW": "生育期の植生ピークが低い状態です",
+    "NDVI_AMPLITUDE_LOW": "季節による植生変化が小さい状態です",
+    "SIGNAL_CONFLICT": "SARと光学の指標が一致していません",
+    "NEAR_THRESHOLD": "判定値が閾値付近です",
+    "SMALL_FIELD_SEVERE": "0.05 ha未満の小区画のため混合画素の影響を確認します",
+    "LOW_CONFIDENCE": "ルールを支える証拠が弱いため確認が必要です",
+    "INSUFFICIENT_OPTICAL_OBSERVATIONS": "光学観測が必要数に達していません",
+    "INSUFFICIENT_SAR_OBSERVATIONS": "SAR観測が必要数に達していません"
+  }
+}
