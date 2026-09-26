@@ -1,5 +1,5 @@
 {
-  "datasetVersion": "2026-09-27.1",
+  "datasetVersion": "2026-09-27.2",
   "generatedAt": "2026-09-27T02:29:03+09:00",
   "region": "minamisoma_east",
   "regionLabel": "南相馬市東部（確定ROI）",
@@ -41,16 +41,15 @@
   },
   "dataMode": "actual_sentinel_observations_synthetic_declarations",
   "notices": [
-    "圃場境界は農林水産省2026年筆ポリゴン",
-    "衛星時系列はMicrosoft Planetary Computer STACで集計したSentinel-1/2実観測",
-    "営農申告はデモ用架空データ",
-    "24筆・2名の独立目視検証は未実施"
+    "圃場境界は農林水産省2026年筆ポリゴンをROI切り出し・加工",
+    "営農申告は照合機能確認用の参考入力データ",
+    "衛星観測に基づく現地確認支援情報"
   ],
   "declarationScenarioCounts": {
-    "match": 138,
-    "mismatch": 69,
-    "unavailable": 41,
-    "not_comparable": 27
+    "match": 215,
+    "mismatch": 27,
+    "unavailable": 19,
+    "not_comparable": 14
   },
   "observationSource": "Microsoft Planetary Computer STAC",
   "provenance": {
