@@ -6,6 +6,8 @@ test('主要業務フローと4画面が動作する', async ({ page }, testInfo
   page.on('console', message=>{if(message.type()==='error')errors.push(message.text())})
   await page.goto('/')
   await expect(page.getByRole('heading',{name:/現地確認が必要な農地/})).toBeVisible()
+  await expect(page.getByText('衛星観測は実データです')).toBeVisible()
+  await expect(page.getByText('Sentinel実観測',{exact:true})).toBeVisible()
   await expect(page.getByText('全275筆中')).toBeVisible()
   await expect(page.getByRole('heading',{name:'2025年の衛星判定'})).toBeVisible()
   await expect(page.locator('.maplibregl-canvas')).toBeVisible()
@@ -21,6 +23,8 @@ test('主要業務フローと4画面が動作する', async ({ page }, testInfo
     await page.screenshot({ path:'tmp/qa-estimate.png', fullPage:true })
     await page.getByRole('button',{name:'判定方法'}).click()
     await expect(page.getByRole('heading',{name:'この判定について'})).toBeVisible()
+    await expect(page.getByText(/S1 58シーン／S2 111シーン/)).toBeVisible()
+    await expect(page.getByText(/Cloud Probability 40%未満は未適用/)).toBeVisible()
     await page.screenshot({ path:'tmp/qa-method.png', fullPage:true })
   }
   expect(errors).toEqual([])

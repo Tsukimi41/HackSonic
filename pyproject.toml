@@ -12,6 +12,8 @@ dependencies = [
     "pandas",
     "matplotlib",
     "rasterio",
+    "pystac-client",
+    "planetary-computer",
     "folium",
     "jupyter",
     "python-pptx>=1.0.2",

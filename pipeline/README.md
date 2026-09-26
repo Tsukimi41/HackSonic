@@ -15,6 +15,24 @@ $env:PYTHONPATH='pipeline'
 
 ## 実観測への切替
 
+### 認証不要の公開STAC経路（今回の配信データ）
+
+Microsoft Planetary Computerの公開STACからSentinel-1 RTCとSentinel-2 L2Aを取得し、筆別CSVと静的成果を生成します。Earth Engine認証は不要です。
+
+```powershell
+$env:PYTHONPATH='pipeline'
+.venv\Scripts\python.exe pipeline\extract_planetary_computer.py
+.venv\Scripts\python.exe pipeline\build_from_gee_exports.py `
+  --s1 tmp\planetary-computer\s1-vh.csv `
+  --s2 tmp\planetary-computer\s2-ndvi.csv `
+  --provenance tmp\planetary-computer\provenance.json
+.venv\Scripts\python.exe pipeline\validate_outputs.py
+```
+
+この経路は、S2のCloud Probabilityバンドが公開STACにないため、SCL除外クラスと20 mバッファを使用します。Earth Engine経路と同じCloud Probability 40%未満を厳密に再現する必要がある場合は次の経路を使います。出典・シーンID・軌道・変換条件は`tmp/planetary-computer/provenance.json`に保存します。
+
+### Earth Engine経路
+
 1. Earth Engineを認証する。
 2. 次を実行して、同一軌道のSentinel-1 VHと雲除去済みSentinel-2 NDVIをGoogle Driveへバッチ出力する。
 

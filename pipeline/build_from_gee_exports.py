@@ -77,7 +77,8 @@ def observations(s1: pd.DataFrame, s2: pd.DataFrame, field_id: str, year: int) -
     return sorted(by_date.values(), key=lambda r: r["date"]), fallback
 
 
-def build(s1_path: Path, s2_path: Path, template_path: Path, out_dir: Path, config_path: Path) -> None:
+def build(s1_path: Path, s2_path: Path, template_path: Path, out_dir: Path, config_path: Path,
+          provenance_path: Path | None = None) -> None:
     config = json.loads(config_path.read_text(encoding="utf-8"))
     collection = json.loads(template_path.read_text(encoding="utf-8"))
     s1, s2 = pd.read_csv(s1_path), pd.read_csv(s2_path)
@@ -123,8 +124,28 @@ def build(s1_path: Path, s2_path: Path, template_path: Path, out_dir: Path, conf
     (out_dir / "field-timeseries.json").write_text(json.dumps({"fields": series}, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     source_manifest = template_path.parent / "manifest.json"
     manifest = json.loads(source_manifest.read_text(encoding="utf-8")) if source_manifest.exists() else {}
-    manifest.update({"generatedAt": datetime.now(JST).isoformat(timespec="seconds"), "dataMode": "actual_sentinel_observations",
-                     "notices": ["圃場境界は農林水産省2026年筆ポリゴン", "衛星時系列はEarth Engineで集計したSentinel-1/2観測", "営農申告はデモ用架空データ"]})
+    provenance = (json.loads(provenance_path.read_text(encoding="utf-8"))
+                  if provenance_path and provenance_path.exists() else None)
+    provider = provenance["provider"] if provenance else "Google Earth Engine"
+    notices = ["圃場境界は農林水産省2026年筆ポリゴン",
+               f"衛星時系列は{provider}で集計したSentinel-1/2実観測",
+               "営農申告はデモ用架空データ", "24筆・2名の独立目視検証は未実施"]
+    manifest.update({"generatedAt": datetime.now(JST).isoformat(timespec="seconds"),
+                     "dataMode": "actual_sentinel_observations_synthetic_declarations",
+                     "observationSource": provider, "notices": notices})
+    if provenance:
+        manifest["provenance"] = provenance
+        manifest["relativeOrbitNumberStart"] = provenance["sentinel1"]["relativeOrbit"]
+        manifest["orbitPass"] = provenance["sentinel1"]["orbitPass"]
+        manifest["sourceObservationRange"] = {"start": provenance["observationRange"][0],
+                                              "end": provenance["observationRange"][1]}
+        manifest["cloudMask"] = {
+            "sceneCloudPercent": 20,
+            "fallbackSceneCloudPercent": provenance["sentinel2"]["sceneCloudMaxPercent"],
+            "cloudProbabilityMax": None,
+            "method": provenance["sentinel2"]["cloudMask"],
+            "differenceFromBaseline": "Cloud Probability 40%未満は未適用",
+        }
     (out_dir / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
     methodology_path = template_path.parent / "methodology.json"
     if methodology_path.exists():
@@ -140,5 +161,6 @@ if __name__ == "__main__":
     parser.add_argument("--template", type=Path, default=Path("public/data/field-results.geojson"))
     parser.add_argument("--out", type=Path, default=Path("public/data"))
     parser.add_argument("--config", type=Path, default=Path("pipeline/config.json"))
+    parser.add_argument("--provenance", type=Path)
     args = parser.parse_args()
-    build(args.s1, args.s2, args.template, args.out, args.config)
+    build(args.s1, args.s2, args.template, args.out, args.config, args.provenance)

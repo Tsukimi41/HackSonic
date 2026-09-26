@@ -28,6 +28,13 @@ export interface Manifest {
   datasetVersion: string; generatedAt: string; regionLabel: string; roi: [number, number, number, number]
   baselineYear: number; targetYear: number; polygonVintage: number; fieldCount: number; methodVersion: string
   relativeOrbitNumberStart: number; orbitPass: string; dataMode: string; notices: string[]
+  observationSource?: string
+  provenance?: {
+    provider: string; stacUrl?: string; collections?: string[]
+    sentinel1?: { sceneCount: number; relativeOrbit: number; orbitPass: string }
+    sentinel2?: { sceneCount: number; sceneCloudMaxPercent: number; cloudMask: string; cloudProbability?: string }
+  }
+  cloudMask?: { sceneCloudPercent?: number; fallbackSceneCloudPercent?: number; cloudProbabilityMax?: number | null; method?: string; differenceFromBaseline?: string }
   thresholds: { sarFloodDropDb: number; ndviGrowthRise: number; ndviPeak: number; ndviHarvestDrop: number }
 }
 export interface Methodology {

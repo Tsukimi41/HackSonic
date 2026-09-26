@@ -1,6 +1,6 @@
 {
   "datasetVersion": "2026-09-27.1",
-  "generatedAt": "2026-09-27T00:00:00+09:00",
+  "generatedAt": "2026-09-27T02:29:03+09:00",
   "region": "minamisoma_east",
   "regionLabel": "南相馬市東部（確定ROI）",
   "roi": [
@@ -31,23 +31,56 @@
   "cloudMask": {
     "sceneCloudPercent": 20,
     "fallbackSceneCloudPercent": 30,
-    "cloudProbabilityMax": 40,
-    "maskBufferMeters": 20
+    "cloudProbabilityMax": null,
+    "method": "SCL invalid classes + 20m square buffer",
+    "differenceFromBaseline": "Cloud Probability 40%未満は未適用"
   },
   "sourceObservationRange": {
     "start": "2024-01-01",
     "end": "2025-12-31"
   },
-  "dataMode": "official_polygons_reproducible_simulated_observations",
+  "dataMode": "actual_sentinel_observations_synthetic_declarations",
   "notices": [
-    "圃場境界は農林水産省2026年筆ポリゴンをROI切り出し・加工",
-    "衛星時系列と営農申告はアルゴリズム・UI実演用の再現可能な模擬データ",
-    "実在圃場の作付・休耕や行政判断を示さない"
+    "圃場境界は農林水産省2026年筆ポリゴン",
+    "衛星時系列はMicrosoft Planetary Computer STACで集計したSentinel-1/2実観測",
+    "営農申告はデモ用架空データ",
+    "24筆・2名の独立目視検証は未実施"
   ],
   "declarationScenarioCounts": {
     "match": 138,
     "mismatch": 69,
     "unavailable": 41,
     "not_comparable": 27
+  },
+  "observationSource": "Microsoft Planetary Computer STAC",
+  "provenance": {
+    "provider": "Microsoft Planetary Computer STAC",
+    "stacUrl": "https://planetarycomputer.microsoft.com/api/stac/v1/",
+    "collections": [
+      "sentinel-1-rtc",
+      "sentinel-2-l2a"
+    ],
+    "observationRange": [
+      "2024-01-01",
+      "2025-12-31"
+    ],
+    "roi": [
+      141.005,
+      37.608,
+      141.033,
+      37.62
+    ],
+    "sentinel1": {
+      "orbitPass": "DESCENDING",
+      "relativeOrbit": 46,
+      "sceneCount": 58,
+      "unitConversion": "10*log10(RTC linear VH)"
+    },
+    "sentinel2": {
+      "sceneCloudMaxPercent": 30,
+      "sceneCount": 111,
+      "cloudMask": "SCL invalid classes + 20m square buffer",
+      "cloudProbability": "not available in this STAC collection"
+    }
   }
 }

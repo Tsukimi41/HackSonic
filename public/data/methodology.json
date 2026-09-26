@@ -29,98 +29,98 @@
       "value": null,
       "changed_fields": 0,
       "status_counts": {
-        "review_required": 103,
-        "cultivation_signal": 133,
-        "fallow_candidate": 30,
-        "insufficient_observation": 9
+        "review_required": 136,
+        "cultivation_signal": 48,
+        "insufficient_observation": 76,
+        "fallow_candidate": 15
       }
     },
     {
       "parameter": "sar_flood_drop_db",
       "value": 7,
-      "changed_fields": 0,
+      "changed_fields": 16,
       "status_counts": {
-        "review_required": 103,
-        "cultivation_signal": 133,
-        "fallow_candidate": 30,
-        "insufficient_observation": 9
+        "review_required": 150,
+        "cultivation_signal": 34,
+        "insufficient_observation": 76,
+        "fallow_candidate": 15
       }
     },
     {
       "parameter": "sar_flood_drop_db",
       "value": 11,
-      "changed_fields": 86,
+      "changed_fields": 5,
       "status_counts": {
-        "review_required": 155,
-        "fallow_candidate": 47,
-        "cultivation_signal": 64,
-        "insufficient_observation": 9
+        "review_required": 131,
+        "cultivation_signal": 53,
+        "insufficient_observation": 76,
+        "fallow_candidate": 15
       }
     },
     {
       "parameter": "ndvi_growth_rise",
       "value": 0.15,
-      "changed_fields": 0,
+      "changed_fields": 7,
       "status_counts": {
-        "review_required": 103,
-        "cultivation_signal": 133,
-        "fallow_candidate": 30,
-        "insufficient_observation": 9
+        "review_required": 143,
+        "cultivation_signal": 48,
+        "insufficient_observation": 76,
+        "fallow_candidate": 8
       }
     },
     {
       "parameter": "ndvi_growth_rise",
       "value": 0.25,
-      "changed_fields": 0,
+      "changed_fields": 7,
       "status_counts": {
-        "review_required": 103,
-        "cultivation_signal": 133,
-        "fallow_candidate": 30,
-        "insufficient_observation": 9
+        "review_required": 131,
+        "cultivation_signal": 47,
+        "insufficient_observation": 76,
+        "fallow_candidate": 21
       }
     },
     {
       "parameter": "ndvi_peak",
       "value": 0.45,
-      "changed_fields": 0,
+      "changed_fields": 42,
       "status_counts": {
-        "review_required": 103,
-        "cultivation_signal": 133,
-        "fallow_candidate": 30,
-        "insufficient_observation": 9
+        "review_required": 98,
+        "cultivation_signal": 88,
+        "insufficient_observation": 76,
+        "fallow_candidate": 13
       }
     },
     {
       "parameter": "ndvi_peak",
       "value": 0.55,
-      "changed_fields": 0,
+      "changed_fields": 42,
       "status_counts": {
-        "review_required": 103,
-        "cultivation_signal": 133,
-        "fallow_candidate": 30,
-        "insufficient_observation": 9
+        "review_required": 176,
+        "cultivation_signal": 7,
+        "insufficient_observation": 76,
+        "fallow_candidate": 16
       }
     },
     {
       "parameter": "ndvi_harvest_drop",
       "value": 0.2,
-      "changed_fields": 0,
+      "changed_fields": 3,
       "status_counts": {
-        "review_required": 103,
-        "cultivation_signal": 133,
-        "fallow_candidate": 30,
-        "insufficient_observation": 9
+        "review_required": 137,
+        "cultivation_signal": 47,
+        "insufficient_observation": 76,
+        "fallow_candidate": 15
       }
     },
     {
       "parameter": "ndvi_harvest_drop",
       "value": 0.3,
-      "changed_fields": 64,
+      "changed_fields": 15,
       "status_counts": {
-        "review_required": 167,
-        "cultivation_signal": 69,
-        "fallow_candidate": 30,
-        "insufficient_observation": 9
+        "review_required": 141,
+        "cultivation_signal": 43,
+        "insufficient_observation": 76,
+        "fallow_candidate": 15
       }
     }
   ],
