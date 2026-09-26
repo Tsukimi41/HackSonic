@@ -21,4 +21,5 @@ export const QUALITY: Record<string, string> = {
   BOUNDARY_VINTAGE_DIFFERENCE: '観測年と境界公開年が異なります', SMALL_FIELD_SEVERE: '0.05 ha未満の小区画です',
   SMALL_FIELD_WARNING: '0.10 ha未満の小区画です', SMALL_FIELD_MIXED_PIXEL: '周辺画素が混ざる可能性があります',
   HARVEST_WINDOW_INCOMPLETE: '収穫確認期の観測が不足しています', CLOUD_LIMITED: '雲により光学観測が限られます',
+  SCENE_CLOUD_FALLBACK_30: '必須窓不足のためシーン雲量30%まで緩和しました',
 }

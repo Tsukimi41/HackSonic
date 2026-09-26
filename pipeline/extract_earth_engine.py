@@ -56,7 +56,7 @@ def add_s2_mask(image: ee.Image) -> ee.Image:
 
 def reduce_collection(collection: ee.ImageCollection, fields: ee.FeatureCollection, band: str, prefix: str) -> ee.FeatureCollection:
     def reduce_one(image: ee.Image) -> ee.FeatureCollection:
-        reducer = ee.Reducer.median().combine(ee.Reducer.count(), sharedInputs=True)
+        reducer = ee.Reducer.median().combine(ee.Reducer.count(), sharedInputs=True).setOutputs([f"{prefix}_median", f"{prefix}_count"])
         reduced = image.select(band).reduceRegions(collection=fields, reducer=reducer, scale=10, crs="EPSG:32654", tileScale=4)
         return reduced.map(lambda f: f.set({
             "date": image.date().format("YYYY-MM-dd"),
@@ -64,7 +64,7 @@ def reduce_collection(collection: ee.ImageCollection, fields: ee.FeatureCollecti
             "relative_orbit": image.get("relativeOrbitNumber_start"),
             "orbit_pass": image.get("orbitProperties_pass"),
             "value_name": prefix,
-            "valid_ratio": ee.Number(f.get(f"{band}_count")).divide(ee.Number(f.get("area_m2")).divide(100)).min(1),
+            "valid_ratio": ee.Number(f.get(f"{prefix}_count")).divide(ee.Number(f.get("area_m2")).divide(100)).min(1),
         }))
     return collection.map(reduce_one).flatten()
 

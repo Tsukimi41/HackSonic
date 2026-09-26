@@ -23,6 +23,13 @@ $env:PYTHONPATH='pipeline'
 ```
 
 3. エクスポートCSVを日付・圃場IDで結合し、`engine.classify_year` の観測スキーマへ渡す。
+   次のコマンドで20%雲量を標準、必須窓不足時のみ30%までのフォールバックとして静的成果へ変換できます。
+
+```powershell
+$env:PYTHONPATH='pipeline'
+.venv\Scripts\python.exe pipeline\build_from_gee_exports.py --s1 <S1_CSV> --s2 <S2_CSV>
+```
+
 4. `validate_outputs.py` と24筆・2名の独立目視検証を通す。
 
 Earth Engineの認証情報やAPIキーはWebアプリへ含めません。シーン雲量20%を標準とし、不足窓だけ30%までの観測を採用する判断はエクスポート後に行います。
