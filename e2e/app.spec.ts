@@ -19,6 +19,13 @@ test('主要業務フローと4画面が動作する', async ({ page }, testInfo
   await expect(page.getByRole('heading',{name:'現地確認リスト'})).toBeVisible()
   await expect(page.locator('.page-title-row p')).toHaveCount(0)
   await expect(page.getByRole('button',{name:'CSVを出力'})).toBeEnabled()
+  const priority=page.getByLabel('優先表示')
+  await expect(priority).toHaveValue('cultivation_signal')
+  await expect(page.locator('tbody tr').first()).toContainText('作付兆候')
+  await expect(page.locator('tbody tr').first()).toContainText('一致')
+  await priority.selectOption('review_required')
+  await expect(page.locator('tbody tr').first()).toContainText('要確認')
+  await expect(page.locator('tbody tr').first()).toContainText('一致')
   if(testInfo.project.name==='desktop-chromium'){
     await page.screenshot({ path:'tmp/qa-candidates.png', fullPage:true })
     await page.getByRole('button',{name:'調査試算'}).click()

@@ -12,7 +12,7 @@ export const SUBTYPE: Record<Subtype, string> = {
 export const CHANGE: Record<ChangeType, string> = {
   paddy_to_upland_candidate: '水田兆候 → 畑作兆候', upland_to_paddy_candidate: '畑作兆候 → 水田兆候',
   cultivated_to_fallow_candidate: '作付兆候 → 休耕可能性', fallow_to_cultivated_candidate: '休耕可能性 → 作付兆候',
-  stable: '大きな変化なし', change_uncertain: '変化判定不能',
+  stable: '大きな変化なし', change_uncertain: '年次比較保留',
 }
 export const MATCH: Record<string, string> = { match: '一致', mismatch: '不一致', not_comparable: '比較不能', unavailable: '申告なし' }
 export const CROP: Record<string, string> = { paddy_rice: '水稲', upland_crop: '畑作物', other_crop: 'その他作物', not_declared: '申告なし', unknown: '不明' }

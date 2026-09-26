@@ -43,3 +43,11 @@ def test_year_change_and_priority_sum():
     parts = priority_components(field, .5)
     assert 0 <= sum(parts.values()) <= 100
     assert parts["declaration"] == 40
+
+
+def test_same_review_status_is_stable_across_years():
+    before = classify("conflict")
+    after = classify("conflict")
+    change, confidence, _ = compare_years(before, after)
+    assert change == "stable"
+    assert confidence is not None

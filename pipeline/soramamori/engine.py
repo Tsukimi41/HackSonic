@@ -183,8 +183,12 @@ def compare_years(baseline: dict[str, Any], target: dict[str, Any]) -> tuple[str
         kind = "paddy_to_upland_candidate"
     elif bs == "upland_crop_signal" and ts == "paddy_signal":
         kind = "upland_to_paddy_candidate"
+    elif b == t:
+        kind = "stable"
     elif b == "review_required" or t == "review_required":
-        kind = "change_uncertain"
+        # 「要確認」は年次比較の欠測ではない。観測値は揃っているため、
+        # 明確な作付⇔休耕遷移がない限り「大きな変化なし」とする。
+        kind = "stable"
     else:
         kind = "stable"
     confidence = min(v for v in [baseline["confidence"], target["confidence"], baseline["observation_quality"], target["observation_quality"]] if v is not None)

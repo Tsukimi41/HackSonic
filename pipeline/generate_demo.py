@@ -79,7 +79,7 @@ def simulate_observations(field_id: str, year: int, scenario: str) -> list[dict]
 
 
 def largest_remainder(total: int) -> dict[str, int]:
-    shares = {"match": .50, "mismatch": .25, "unavailable": .15, "not_comparable": .10}
+    shares = {"match": .78, "mismatch": .10, "unavailable": .07, "not_comparable": .05}
     base = {k: math.floor(total * v) for k, v in shares.items()}
     for key, _ in sorted(shares.items(), key=lambda kv: (-(total * kv[1] - base[kv[0]]), kv[0]))[: total - sum(base.values())]:
         base[key] += 1

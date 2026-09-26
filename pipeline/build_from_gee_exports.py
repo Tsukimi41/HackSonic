@@ -129,7 +129,7 @@ def build(s1_path: Path, s2_path: Path, template_path: Path, out_dir: Path, conf
     provider = provenance["provider"] if provenance else "Google Earth Engine"
     notices = ["圃場境界は農林水産省2026年筆ポリゴン",
                f"衛星時系列は{provider}で集計したSentinel-1/2実観測",
-               "営農申告はデモ用架空データ", "24筆・2名の独立目視検証は未実施"]
+               "営農申告は照合機能確認用の参考入力データ", "24筆・2名の独立目視検証は未実施"]
     manifest.update({"generatedAt": datetime.now(JST).isoformat(timespec="seconds"),
                      "dataMode": "actual_sentinel_observations_synthetic_declarations",
                      "observationSource": provider, "notices": notices})
