@@ -1,11 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
 import * as maplibregl from 'maplibre-gl'
 import type { GeoJSONSource, Map as MlMap, MapMouseEvent } from 'maplibre-gl'
+import maplibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?url'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { Layers, MapPinned } from 'lucide-react'
 import type { FieldCollection } from '../types'
 
 interface Props { data: FieldCollection; roi:[number,number,number,number]; selectedId?:string; onSelect:(id:string)=>void }
+maplibregl.setWorkerUrl(maplibreWorkerUrl)
+
 export function MapPanel({data,roi,selectedId,onSelect}:Props){
   const node=useRef<HTMLDivElement>(null); const mapRef=useRef<MlMap|null>(null); const onSelectRef=useRef(onSelect)
   const [ready,setReady]=useState(false); const [background,setBackground]=useState(true); const [tileWarning,setTileWarning]=useState(false)
