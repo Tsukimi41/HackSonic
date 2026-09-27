@@ -7,11 +7,11 @@ interface Props { field?:FieldProperties; series?:Record<string,YearSeries>; met
 const pct=(v:number|null)=>v==null?'算出不可':`${Math.round(v*100)}%`
 const metric=(label:string,value:string,help?:string)=><div className="metric"><span>{label}</span><strong>{value}</strong>{help&&<small>{help}</small>}</div>
 export function DetailPanel({field,series,methodology,inCandidates,onToggle,onClose}:Props){
-  if(!field)return <aside className="detail-card empty-detail"><Satellite size={36}/><h2>圃場を選択してください</h2><p>地図または一覧から圃場を選ぶと、判定根拠と時系列を確認できます。</p></aside>
+  if(!field)return <aside className="detail-card empty-detail"><Satellite size={36}/><h2>農地を選択してください</h2><p>地図または一覧から農地を選ぶと、判定根拠と時系列を確認できます。</p></aside>
   const status=STATUS[field.status]; const reasons=field.reason_codes.map(c=>methodology.reasonLabels[c]??c)
   const s2024=series?.['2024']; const s2025=series?.['2025']
   return <aside className="detail-card" aria-labelledby="detail-title">
-    <div className="detail-top"><div><h2 id="detail-title">{field.field_id.replace('maff-2026-','圃場 ')}</h2></div>{onClose&&<button className="icon-button" onClick={onClose} aria-label="詳細を閉じる"><X/></button>}</div>
+    <div className="detail-top"><div><h2 id="detail-title">{field.field_id.replace('maff-2026-','農地 ')}</h2></div>{onClose&&<button className="icon-button" onClick={onClose} aria-label="詳細を閉じる"><X/></button>}</div>
     <div className="status-hero" style={{borderLeftColor:status.color}}><div><span className={`status-pill ${status.tone}`}>{status.label}</span><p>{reasons[0]}</p></div><div className="confidence"><strong>{pct(field.confidence)}</strong><span>証拠の強さ</span></div></div>
     <p className="caution"><AlertTriangle size={17}/>衛星解析だけでは確定できません。交付金等の判断には所定の確認が必要です。</p>
     <section className="detail-section"><div className="section-title"><h3>申告との照合</h3></div>
