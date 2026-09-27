@@ -27,19 +27,28 @@ def _row_value(row: pd.Series, names: list[str]) -> float | None:
     return None
 
 
-def _valid(row: pd.Series, count_names: list[str]) -> bool:
+def _minimum_pixels(area_ha: float) -> int:
+    """10m画素に対して小さい筆にも、面積に応じた現実的な下限を使う。"""
+    if area_ha < .05:
+        return 1
+    if area_ha < .10:
+        return 2
+    return 3
+
+
+def _valid(row: pd.Series, count_names: list[str], minimum_pixels: int = 3) -> bool:
     count = _row_value(row, count_names)
     ratio = _row_value(row, ["valid_ratio"])
-    return count is not None and ratio is not None and count >= 3 and ratio >= .5
+    return count is not None and ratio is not None and count >= minimum_pixels and ratio >= .5
 
 
-def _s2_with_fallback(group: pd.DataFrame) -> tuple[pd.DataFrame, bool]:
+def _s2_with_fallback(group: pd.DataFrame, minimum_pixels: int) -> tuple[pd.DataFrame, bool]:
     """20%を標準とし、必須窓不足時だけ20–30%のシーンを足す。"""
     group = group.copy()
     group["date_parsed"] = pd.to_datetime(group["date"])
     cloud_source = group["scene_cloud_percent"] if "scene_cloud_percent" in group else pd.Series(0, index=group.index)
     group["cloud"] = pd.to_numeric(cloud_source, errors="coerce").fillna(0)
-    group["pixel_valid"] = group.apply(lambda r: _valid(r, ["ndvi_count", "NDVI_count", "count"]), axis=1)
+    group["pixel_valid"] = group.apply(lambda r: _valid(r, ["ndvi_count", "NDVI_count", "count"], minimum_pixels), axis=1)
     selected = group[group["pixel_valid"] & (group["cloud"] <= 20)].copy()
     month = selected["date_parsed"].dt.month
     may_ok = (month == 5).sum() >= 2
@@ -55,18 +64,19 @@ def _s2_with_fallback(group: pd.DataFrame) -> tuple[pd.DataFrame, bool]:
     return pd.concat([selected, extra]).drop_duplicates(subset=["date"]).sort_values("date"), not extra.empty
 
 
-def observations(s1: pd.DataFrame, s2: pd.DataFrame, field_id: str, year: int) -> tuple[list[dict[str, Any]], bool]:
+def observations(s1: pd.DataFrame, s2: pd.DataFrame, field_id: str, year: int, area_ha: float) -> tuple[list[dict[str, Any]], bool]:
     by_date: dict[str, dict[str, Any]] = {}
+    minimum_pixels = _minimum_pixels(area_ha)
     s1_group = s1[(s1["field_id"] == field_id) & pd.to_datetime(s1["date"]).dt.year.eq(year)]
     for _, row in s1_group.iterrows():
-        valid = _valid(row, ["vh_db_count", "VH_count", "count"])
+        valid = _valid(row, ["vh_db_count", "VH_count", "count"], minimum_pixels)
         date = str(row["date"])[:10]
         by_date[date] = {"date": date, "ndvi": None, "vh_db": _row_value(row, ["vh_db_median", "VH_median", "median"]),
                          "vv_db": None, "valid_s1": valid, "valid_s2": False,
                          "valid_pixel_count": int(_row_value(row, ["vh_db_count", "VH_count", "count"]) or 0),
                          "expected_pixel_count": None, "valid_ratio": _row_value(row, ["valid_ratio"]) or 0}
     s2_group = s2[(s2["field_id"] == field_id) & pd.to_datetime(s2["date"]).dt.year.eq(year)]
-    selected, fallback = _s2_with_fallback(s2_group)
+    selected, fallback = _s2_with_fallback(s2_group, minimum_pixels)
     for _, row in selected.iterrows():
         date = str(row["date"])[:10]
         target = by_date.setdefault(date, {"date": date, "ndvi": None, "vh_db": None, "vv_db": None, "valid_s1": False,
@@ -90,7 +100,7 @@ def build(s1_path: Path, s2_path: Path, template_path: Path, out_dir: Path, conf
         yearly = {}
         series[p["field_id"]] = {}
         for year in (2024, 2025):
-            rows, fallback = observations(s1, s2, p["field_id"], year)
+            rows, fallback = observations(s1, s2, p["field_id"], year, p["area_ha"])
             result = classify_year(rows, config, p["area_ha"])
             if fallback:
                 result["quality_flags"].append("SCENE_CLOUD_FALLBACK_30")
@@ -131,6 +141,7 @@ def build(s1_path: Path, s2_path: Path, template_path: Path, out_dir: Path, conf
                f"衛星時系列は{provider}で集計したSentinel-1/2実観測",
                "営農申告は照合機能確認用の参考入力データ", "24筆・2名の独立目視検証は未実施"]
     manifest.update({"generatedAt": datetime.now(JST).isoformat(timespec="seconds"),
+                     "datasetVersion": config["dataset_version"], "methodVersion": config["method_version"],
                      "dataMode": "actual_sentinel_observations_synthetic_declarations",
                      "observationSource": provider, "notices": notices})
     if provenance:

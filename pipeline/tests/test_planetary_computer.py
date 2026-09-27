@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 import numpy as np
 
 from extract_planetary_computer import _choose_orbit, _dilate
+from build_from_gee_exports import _minimum_pixels
 
 
 class Item:
@@ -31,3 +32,8 @@ def test_cloud_buffer_expands_two_pixels() -> None:
     assert dilated.sum() == 25
     assert dilated[1:6, 1:6].all()
 
+
+def test_minimum_pixels_adapts_to_field_area() -> None:
+    assert _minimum_pixels(.03) == 1
+    assert _minimum_pixels(.08) == 2
+    assert _minimum_pixels(.30) == 3

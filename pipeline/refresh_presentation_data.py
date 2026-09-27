@@ -65,6 +65,7 @@ def main() -> None:
     manifest_path = DATA / "manifest.json"
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     manifest["datasetVersion"] = config["dataset_version"]
+    manifest["methodVersion"] = config["method_version"]
     manifest["declarationScenarioCounts"] = counts
     manifest["notices"] = [
         "圃場境界は農林水産省2026年筆ポリゴンをROI切り出し・加工",

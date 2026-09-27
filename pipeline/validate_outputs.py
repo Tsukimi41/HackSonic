@@ -37,8 +37,10 @@ def validate() -> None:
         assert round(sum(p["priority_components"].values()), 2) == p["priority_score"]
         if p["status"] == "insufficient_observation":
             assert p["cultivation_subtype"] == "not_evaluated" and p["confidence"] is None
-        if p["area_ha"] < .05 and p["status"] != "insufficient_observation":
-            assert p["status"] == "review_required"
+        if p["area_ha"] < .05:
+            assert "SMALL_FIELD_SEVERE" in p["quality_flags"]
+            if p["confidence"] is not None:
+                assert p["confidence"] <= .69
         assert p["field_id"] in timeseries and set(timeseries[p["field_id"]]) == {"2024", "2025"}
         for year in ("2024", "2025"):
             rows = timeseries[p["field_id"]][year]["observations"]

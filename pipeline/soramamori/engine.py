@@ -84,22 +84,25 @@ def classify_year(rows: list[dict[str, Any]], config: dict[str, Any], area_ha: f
         quality_flags += ["SMALL_FIELD_WARNING", "SMALL_FIELD_MIXED_PIXEL"]
 
     s2_unknown = growth_event is None or peak_event is None
-    vegetation = True if growth_event is True and peak_event is True else False if growth_event is False and peak_event is False else "partial"
+    # 作付兆候は「5月からの上昇＋高いピーク」を最も強い証拠とするが、
+    # 5月時点ですでに繁茂している作型を落とさないよう、高いピーク単独も採用する。
+    vegetation = True if peak_event is True else False if growth_event is False and peak_event is False else "partial"
+    vegetation_reasons = (["NDVI_GROWTH_RISE"] if growth_event is True else []) + (["NDVI_PEAK_REACHED"] if peak_event is True else [])
     if s2_unknown:
         status, subtype = "insufficient_observation", "not_evaluated"
         reasons = ["INSUFFICIENT_OPTICAL_OBSERVATIONS"]
     elif flood_event is True and vegetation is True:
         status, subtype = "cultivation_signal", "paddy_signal"
-        reasons = ["SAR_FLOOD_DROP", "NDVI_GROWTH_RISE", "NDVI_PEAK_REACHED"]
+        reasons = ["SAR_FLOOD_DROP", *vegetation_reasons]
     elif flood_event is False and vegetation is True:
         status, subtype = "cultivation_signal", "upland_crop_signal"
-        reasons = ["NO_SAR_FLOOD_SIGNAL", "NDVI_GROWTH_RISE", "NDVI_PEAK_REACHED"]
+        reasons = [*vegetation_reasons, "NO_SAR_FLOOD_SIGNAL"]
     elif flood_event is False and vegetation is False:
         status, subtype = "fallow_candidate", "mixed_or_unknown"
         reasons = ["NO_SAR_FLOOD_SIGNAL", "NDVI_PEAK_LOW", "NDVI_AMPLITUDE_LOW"]
     elif flood_event is None and vegetation is True:
         status, subtype = "cultivation_signal", "not_evaluated"
-        reasons = ["INSUFFICIENT_SAR_OBSERVATIONS", "NDVI_GROWTH_RISE", "NDVI_PEAK_REACHED"]
+        reasons = [*vegetation_reasons, "INSUFFICIENT_SAR_OBSERVATIONS"]
     elif flood_event is None:
         status, subtype = "insufficient_observation", "not_evaluated"
         reasons = ["INSUFFICIENT_SAR_OBSERVATIONS"]
@@ -132,11 +135,11 @@ def classify_year(rows: list[dict[str, Any]], config: dict[str, Any], area_ha: f
         harvest_drop is not None and abs(harvest_drop - th["ndvi_harvest_drop"]) <= th["near_ndvi"],
     ])
     if near_threshold and status != "insufficient_observation":
-        status, subtype = "review_required", "mixed_or_unknown"
         reasons.append("NEAR_THRESHOLD")
+        confidence = min(confidence, 0.79) if confidence is not None else None
     if area_ha < agg["small_field_severe_ha"] and status != "insufficient_observation":
-        status, subtype = "review_required", "mixed_or_unknown"
         reasons.append("SMALL_FIELD_SEVERE")
+        confidence = min(confidence, 0.69) if confidence is not None else None
     if confidence is not None and confidence < 0.60:
         status, subtype = "review_required", "mixed_or_unknown"
         reasons.append("LOW_CONFIDENCE")

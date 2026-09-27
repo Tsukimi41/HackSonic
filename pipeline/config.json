@@ -1,6 +1,6 @@
 {
-  "dataset_version": "2026-09-27.2",
-  "method_version": "rules-v1",
+  "dataset_version": "2026-09-27.3",
+  "method_version": "rules-v2",
   "region": "minamisoma_east",
   "municipality": "南相馬市",
   "roi": [141.005, 37.608, 141.033, 37.620],
@@ -36,6 +36,8 @@
     "inner_buffer_meters": 5,
     "fallback_area_m2": 200,
     "minimum_valid_pixels": 3,
+    "minimum_valid_pixels_medium_field": 2,
+    "minimum_valid_pixels_small_field": 1,
     "minimum_valid_ratio": 0.5,
     "small_field_severe_ha": 0.05,
     "small_field_warning_ha": 0.1

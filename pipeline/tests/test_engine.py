@@ -20,11 +20,11 @@ def test_slide_rule_patterns():
     assert classify("insufficient")["status"] == "insufficient_observation"
 
 
-def test_small_field_is_reviewed():
+def test_small_field_keeps_signal_with_capped_confidence():
     result = classify("paddy", area=.03)
-    assert result["status"] == "review_required"
+    assert result["status"] == "cultivation_signal"
     assert "SMALL_FIELD_SEVERE" in result["reason_codes"]
-    assert result["confidence"] <= .79
+    assert result["confidence"] <= .69
 
 
 def test_threshold_is_inclusive_and_uses_raw_value():
@@ -33,6 +33,17 @@ def test_threshold_is_inclusive_and_uses_raw_value():
     result = classify_year(rows, cfg, .3)
     assert result["features"]["growth_event"] is True
     assert 0 <= result["observation_quality"] <= 1
+
+
+def test_high_ndvi_peak_is_cultivation_signal_even_with_high_may_baseline():
+    rows = simulate_observations("peak-only", 2025, "upland")
+    for row in rows:
+        if row["date"][5:7] == "05":
+            row["ndvi"] = .55
+    result = classify_year(rows, CONFIG, .3)
+    assert result["features"]["growth_event"] is False
+    assert result["features"]["peak_event"] is True
+    assert result["status"] == "cultivation_signal"
 
 
 def test_year_change_and_priority_sum():

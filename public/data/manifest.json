@@ -1,6 +1,6 @@
 {
-  "datasetVersion": "2026-09-27.2",
-  "generatedAt": "2026-09-27T02:29:03+09:00",
+  "datasetVersion": "2026-09-27.3",
+  "generatedAt": "2026-09-27T09:04:23+09:00",
   "region": "minamisoma_east",
   "regionLabel": "南相馬市東部（確定ROI）",
   "roi": [
@@ -18,7 +18,7 @@
   "polygonVintage": 2026,
   "crs": "EPSG:4326",
   "fieldCount": 275,
-  "methodVersion": "rules-v1",
+  "methodVersion": "rules-v2",
   "relativeOrbitNumberStart": 46,
   "orbitPass": "DESCENDING",
   "syntheticDeclarationSeed": 20260927,
