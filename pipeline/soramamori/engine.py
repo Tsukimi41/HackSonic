@@ -83,7 +83,9 @@ def classify_year(rows: list[dict[str, Any]], config: dict[str, Any], area_ha: f
     elif area_ha < agg["small_field_warning_ha"]:
         quality_flags += ["SMALL_FIELD_WARNING", "SMALL_FIELD_MIXED_PIXEL"]
 
-    s2_unknown = growth_event is None or peak_event is None
+    # 生育前基準が欠けても、十分に高い生育期ピークがあれば作付兆候は評価できる。
+    # ピーク自体が不明、または低いピークで上昇量も不明な場合だけ観測不足とする。
+    s2_unknown = peak_event is None or (peak_event is False and growth_event is None)
     # 作付兆候は「5月からの上昇＋高いピーク」を最も強い証拠とするが、
     # 5月時点ですでに繁茂している作型を落とさないよう、高いピーク単独も採用する。
     vegetation = True if peak_event is True else False if growth_event is False and peak_event is False else "partial"

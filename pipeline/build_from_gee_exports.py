@@ -91,6 +91,12 @@ def build(s1_path: Path, s2_path: Path, template_path: Path, out_dir: Path, conf
           provenance_path: Path | None = None) -> None:
     config = json.loads(config_path.read_text(encoding="utf-8"))
     collection = json.loads(template_path.read_text(encoding="utf-8"))
+    west, south, east, north = config["roi"]
+    collection["features"] = [
+        feature for feature in collection["features"]
+        if west <= feature["properties"]["centroid_lon"] <= east
+        and south <= feature["properties"]["centroid_lat"] <= north
+    ]
     s1, s2 = pd.read_csv(s1_path), pd.read_csv(s2_path)
     series: dict[str, Any] = {}
     properties = [f["properties"] for f in collection["features"]]
@@ -142,6 +148,7 @@ def build(s1_path: Path, s2_path: Path, template_path: Path, out_dir: Path, conf
                "営農申告は照合機能確認用の参考入力データ", "24筆・2名の独立目視検証は未実施"]
     manifest.update({"generatedAt": datetime.now(JST).isoformat(timespec="seconds"),
                      "datasetVersion": config["dataset_version"], "methodVersion": config["method_version"],
+                     "fieldCount": len(properties),
                      "dataMode": "actual_sentinel_observations_synthetic_declarations",
                      "observationSource": provider, "notices": notices})
     if provenance:

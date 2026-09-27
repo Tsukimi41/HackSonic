@@ -1,6 +1,6 @@
 {
-  "dataset_version": "2026-09-27.3",
-  "method_version": "rules-v2",
+  "dataset_version": "2026-09-27.4",
+  "method_version": "rules-v3",
   "region": "minamisoma_east",
   "municipality": "南相馬市",
   "roi": [141.005, 37.608, 141.033, 37.620],
