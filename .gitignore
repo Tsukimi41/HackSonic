@@ -42,6 +42,7 @@ tutorials/fukushima_field_results.*
 submissions/camp/team-gamma/*.csv
 submissions/camp/team-gamma/*.html
 
+*.ps1
 
 *md
 *.png
