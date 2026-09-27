@@ -30,9 +30,9 @@
       "changed_fields": 0,
       "status_counts": {
         "fallow_candidate": 70,
-        "cultivation_signal": 156,
+        "cultivation_signal": 159,
         "review_required": 23,
-        "insufficient_observation": 26
+        "insufficient_observation": 9
       }
     },
     {
@@ -41,9 +41,9 @@
       "changed_fields": 0,
       "status_counts": {
         "fallow_candidate": 70,
-        "cultivation_signal": 156,
+        "cultivation_signal": 159,
         "review_required": 23,
-        "insufficient_observation": 26
+        "insufficient_observation": 9
       }
     },
     {
@@ -52,9 +52,9 @@
       "changed_fields": 0,
       "status_counts": {
         "fallow_candidate": 70,
-        "cultivation_signal": 156,
+        "cultivation_signal": 159,
         "review_required": 23,
-        "insufficient_observation": 26
+        "insufficient_observation": 9
       }
     },
     {
@@ -63,8 +63,8 @@
       "changed_fields": 14,
       "status_counts": {
         "review_required": 37,
-        "cultivation_signal": 156,
-        "insufficient_observation": 26,
+        "cultivation_signal": 159,
+        "insufficient_observation": 9,
         "fallow_candidate": 56
       }
     },
@@ -74,9 +74,9 @@
       "changed_fields": 6,
       "status_counts": {
         "fallow_candidate": 76,
-        "cultivation_signal": 156,
+        "cultivation_signal": 159,
         "review_required": 17,
-        "insufficient_observation": 26
+        "insufficient_observation": 9
       }
     },
     {
@@ -85,20 +85,20 @@
       "changed_fields": 23,
       "status_counts": {
         "fallow_candidate": 62,
-        "cultivation_signal": 179,
-        "insufficient_observation": 26,
+        "cultivation_signal": 182,
+        "insufficient_observation": 9,
         "review_required": 8
       }
     },
     {
       "parameter": "ndvi_peak",
       "value": 0.55,
-      "changed_fields": 65,
+      "changed_fields": 66,
       "status_counts": {
         "fallow_candidate": 82,
-        "cultivation_signal": 91,
+        "cultivation_signal": 93,
         "review_required": 76,
-        "insufficient_observation": 26
+        "insufficient_observation": 10
       }
     },
     {
@@ -107,9 +107,9 @@
       "changed_fields": 0,
       "status_counts": {
         "fallow_candidate": 70,
-        "cultivation_signal": 156,
+        "cultivation_signal": 159,
         "review_required": 23,
-        "insufficient_observation": 26
+        "insufficient_observation": 9
       }
     },
     {
@@ -118,9 +118,9 @@
       "changed_fields": 0,
       "status_counts": {
         "fallow_candidate": 70,
-        "cultivation_signal": 156,
+        "cultivation_signal": 159,
         "review_required": 23,
-        "insufficient_observation": 26
+        "insufficient_observation": 9
       }
     }
   ],

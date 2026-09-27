@@ -1,6 +1,6 @@
 {
-  "datasetVersion": "2026-09-27.3",
-  "generatedAt": "2026-09-27T09:04:23+09:00",
+  "datasetVersion": "2026-09-27.4",
+  "generatedAt": "2026-09-27T09:12:12+09:00",
   "region": "minamisoma_east",
   "regionLabel": "南相馬市東部（確定ROI）",
   "roi": [
@@ -17,8 +17,8 @@
   ],
   "polygonVintage": 2026,
   "crs": "EPSG:4326",
-  "fieldCount": 275,
-  "methodVersion": "rules-v2",
+  "fieldCount": 261,
+  "methodVersion": "rules-v3",
   "relativeOrbitNumberStart": 46,
   "orbitPass": "DESCENDING",
   "syntheticDeclarationSeed": 20260927,
@@ -46,10 +46,10 @@
     "衛星観測に基づく現地確認支援情報"
   ],
   "declarationScenarioCounts": {
-    "match": 215,
-    "mismatch": 27,
-    "unavailable": 19,
-    "not_comparable": 14
+    "match": 204,
+    "mismatch": 26,
+    "unavailable": 18,
+    "not_comparable": 13
   },
   "observationSource": "Microsoft Planetary Computer STAC",
   "provenance": {
