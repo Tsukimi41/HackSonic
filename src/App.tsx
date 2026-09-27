@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { AlertCircle, ChevronRight, ClipboardCheck, Download, Filter, HelpCircle, Leaf, ListFilter, LoaderCircle, Map as MapIcon, RotateCcw, Search, ShieldCheck, Trash2 } from 'lucide-react'
+import { AlertCircle, ChevronRight, ClipboardCheck, Download, Filter, HelpCircle, ListFilter, LoaderCircle, Map as MapIcon, RotateCcw, Search, ShieldCheck, Trash2 } from 'lucide-react'
 import { CHANGE, CROP, MATCH, STATUS, SUBTYPE } from './labels'
 import { buildCandidateCsv, csvFilename, sortedCandidates, type CandidatePreference } from './csv'
 import { MapPanel } from './components/MapPanel'
 import { DetailPanel } from './components/DetailPanel'
 import type { ChangeType, FieldCollection, FieldFeature, FieldProperties, Manifest, Methodology, Status, Timeseries } from './types'
+import faviconUrl from './favicon.ico'
 import './styles.css'
 
 type Page='dashboard'|'candidates'|'method'
@@ -34,11 +35,11 @@ export default function App(){
   if(data.loading)return <div className="loading" role="status"><LoaderCircle className="spin"/><strong>圃場データを読み込んでいます</strong><span>衛星解析結果を準備中です</span></div>
   if(data.error||!data.manifest||!data.fields||!data.timeseries||!data.methodology)return <div className="error-screen"><AlertCircle/><h1>データを読み込めませんでした</h1><p>{data.error}</p><button className="button button-primary" onClick={()=>setRetry(x=>x+1)}>再読み込み</button></div>
   const nav=(target:Page,label:string,Icon:typeof MapIcon)=><button className={page===target?'active':''} onClick={()=>setPage(target)} aria-current={page===target?'page':undefined}><Icon size={18}/><span>{label}</span>{target==='candidates'&&<b>{candidateIds.size}</b>}</button>
-  return <div className="app-shell"><header className="site-header"><div className="brand" onClick={()=>setPage('dashboard')} onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();setPage('dashboard')}}} role="button" tabIndex={0}><span className="brand-mark"><Leaf/></span><div><strong>そらまもり<em>農地</em></strong><small>衛星データによる作付確認支援</small></div></div><nav aria-label="主要メニュー">{nav('dashboard','圃場を探す',MapIcon)}{nav('candidates','現地確認リスト',ClipboardCheck)}{nav('method','判定方法',HelpCircle)}</nav></header>
+  return <div className="app-shell"><header className="site-header"><div className="brand" onClick={()=>setPage('dashboard')} onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();setPage('dashboard')}}} role="button" tabIndex={0}><img className="brand-mark" src={faviconUrl} alt="" aria-hidden="true"/><div><strong>そらまもり<em>農地</em></strong><small>衛星データによる作付確認支援</small></div></div><nav aria-label="主要メニュー">{nav('dashboard','圃場を探す',MapIcon)}{nav('candidates','現地確認リスト',ClipboardCheck)}{nav('method','判定方法',HelpCircle)}</nav></header>
     <main id="main">{page==='dashboard'&&<Dashboard manifest={data.manifest} all={data.fields} filtered={filtered!} methodology={data.methodology} selected={selected} selectedSeries={selectedSeries} selectedId={selectedId} onSelect={setSelectedId} statuses={statuses} setStatuses={setStatuses} confidence={confidence} setConfidence={setConfidence} minArea={minArea} setMinArea={setMinArea} maxArea={maxArea} setMaxArea={setMaxArea} change={change} setChange={setChange} query={query} setQuery={setQuery} reset={()=>{setStatuses(ALL_STATUSES);setConfidence(0);setMinArea('');setMaxArea('');setChange('all');setQuery('')}} inCandidates={selectedId?candidateIds.has(selectedId):false} onToggle={()=>selectedId&&toggleCandidate(selectedId)} openCandidates={()=>setPage('candidates')}/>} 
       {page==='candidates'&&<Candidates fields={candidates} manifest={data.manifest} methodology={data.methodology} onSelect={id=>{setSelectedId(id);setPage('dashboard')}} onRemove={toggleCandidate} onClear={()=>setCandidateIds(new Set())}/>}
       {page==='method'&&<Method manifest={data.manifest} methodology={data.methodology}/>}</main>
-    <footer><div><strong>そらまもり農地</strong></div><p>Contains modified Copernicus Sentinel data 2024–2025<br/>出典：「筆ポリゴンデータ」（農林水産省・2026年）を加工して作成／© OpenStreetMap contributors</p></footer>
+    <footer><div className="footer-brand"><img src={faviconUrl} alt="" aria-hidden="true"/><strong>そらまもり農地</strong></div><p>Contains modified Copernicus Sentinel data 2024–2025<br/>出典：「筆ポリゴンデータ」（農林水産省・2026年）を加工して作成／© OpenStreetMap contributors</p></footer>
   </div>
 }
 
