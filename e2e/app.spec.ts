@@ -5,7 +5,7 @@ test('主要業務フローと3画面が動作する', async ({ page }, testInfo
   page.on('pageerror', e=>errors.push(e.message))
   page.on('console', message=>{if(message.type()==='error')errors.push(message.text())})
   await page.goto('/')
-  await expect(page.getByRole('heading',{name:/現地確認が必要な農地/})).toBeVisible()
+  await expect(page.getByText(/現地確認が必要な農地/)).toHaveCount(0)
   await expect(page.locator('.data-badges')).toHaveCount(0)
   await expect(page.locator('.page-intro p')).toHaveCount(0)
   await expect(page.locator('.eyebrow')).toHaveCount(0)
