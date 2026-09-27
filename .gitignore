@@ -1,5 +1,5 @@
-AGENTS.md
-CLAUDE.md
+*.pptx
+
 
 # Python
 __pycache__/
@@ -41,3 +41,6 @@ tutorials/fukushima_field_results.*
 # team-gamma: GEEパイプラインの生成物（スクリプトを再実行すれば作れるため追跡しない）
 submissions/camp/team-gamma/*.csv
 submissions/camp/team-gamma/*.html
+
+
+*md
